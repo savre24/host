@@ -65,7 +65,7 @@ const UnderlineOpacity = () => {
 };
 const UnderlineOffset = () => {
   return <ComponentContainerCard title='Underline offset' description={<>Change the underline’s opacity. Requires adding <code>.link-underline</code> to first set an <code>rgba()</code> color we use to then modify the alpha opacity.</>}>
-      <p><Link href="">Default link</Link></p>
+      <p><Link href="#!">Default link</Link></p>
       <p><Link className="text-decoration-underline link-offset-1" href="">Offset 1 link</Link></p>
       <p><Link className="text-decoration-underline link-offset-2" href="">Offset 2 link</Link></p>
       <p className="mb-0"><Link className="text-decoration-underline link-offset-3" href="">Offset 3 link</Link></p>

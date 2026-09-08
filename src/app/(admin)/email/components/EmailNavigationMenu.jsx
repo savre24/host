@@ -38,7 +38,7 @@ const NavBar = ({
             <span>Inbox</span>
             <span className="badge bg-danger-subtle fs-12 text-danger ms-auto">21</span>
           </Link>
-          <Link href="">
+          <Link href="#!">
             <IconifyIcon icon="solar:map-arrow-right-outline" className="me-2 fs-18 text-muted" />
             <span>Sent</span>
           </Link>
@@ -46,11 +46,11 @@ const NavBar = ({
             <IconifyIcon icon="solar:star-outline" className="me-2 fs-18 text-muted" />
             <span>Starred</span>
           </Link>
-          <Link href="">
+          <Link href="#!">
             <IconifyIcon icon="solar:clock-circle-outline" className="me-2 fs-18 text-muted" />
             <span>Scheduled</span>
           </Link>
-          <Link href="">
+          <Link href="#!">
             <IconifyIcon icon="solar:clapperboard-edit-outline" className="me-2 fs-18 text-muted" />
             <span>Draft</span>
           </Link>
@@ -61,19 +61,19 @@ const NavBar = ({
         <Collapse in={isTrue}>
           <div>
             <div className="email-menu-list d-flex flex-column gap-1 mt-2">
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:mailbox-outline" className="me-2 fs-18 text-muted" />
                 <span>All Mail</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:trash-bin-trash-outline" className="me-2 fs-18 text-muted" />
                 <span>Trash</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:info-square-outline" className="me-2 fs-18 text-muted" />
                 <span>Spam</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:chat-round-line-outline" className="me-2 fs-18 text-muted" />
                 <span>Chats</span>
               </Link>
@@ -86,19 +86,19 @@ const NavBar = ({
         <Collapse in={isLabels}>
           <div>
             <div className="email-menu-list d-flex flex-column gap-1 mt-2">
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:bolt-circle-bold-duotone" className="text-success fs-16 me-2" />
                 <span>Personal</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:bolt-circle-bold-duotone" className="text-danger fs-16 me-2" />
                 <span>Client</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:bolt-circle-bold-duotone" className="text-info fs-16 me-2" />
                 <span>Marketing</span>
               </Link>
-              <Link href="">
+              <Link href="#!">
                 <IconifyIcon icon="solar:bolt-circle-bold-duotone" className="text-secondary fs-16 me-2" />
                 <span>Office</span>
               </Link>

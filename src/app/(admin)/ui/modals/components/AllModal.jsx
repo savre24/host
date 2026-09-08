@@ -222,7 +222,7 @@ const ModalsWithPages = () => {
               <div className="form-check">
                 <input type="checkbox" className="form-check-input" id="customCheck1" />
                 <label className="form-check-label" htmlFor="customCheck1">
-                  I accept <Link href="">Terms and Conditions</Link>
+                  I accept <Link href="#!">Terms and Conditions</Link>
                 </label>
               </div>
             </div>

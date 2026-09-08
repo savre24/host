@@ -24,7 +24,7 @@ const ExampleBreadcrumb = () => {
         </nav>
         <nav aria-label="breadcrumb">
           <Breadcrumb>
-            <BreadcrumbItem className='m-0'><Link href="">Home</Link></BreadcrumbItem>
+            <BreadcrumbItem className='m-0'><Link href="#!">Home</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 24
           }}>
@@ -35,13 +35,13 @@ const ExampleBreadcrumb = () => {
         </nav>
         <nav aria-label="breadcrumb">
           <Breadcrumb>
-            <BreadcrumbItem className='m-0'><Link href="">Home</Link></BreadcrumbItem>
+            <BreadcrumbItem className='m-0'><Link href="#!">Home</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 24
           }}>
               <IconifyIcon icon="tabler:chevron-right" height={16} width={16} />
             </div>
-            <BreadcrumbItem className='m-0'><Link href="">Library</Link></BreadcrumbItem>
+            <BreadcrumbItem className='m-0'><Link href="#!">Library</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 24
           }}>
@@ -69,7 +69,7 @@ const BreadcrumbWithIcons = () => {
         </nav>
         <nav aria-label="breadcrumb">
           <Breadcrumb className="bg-light bg-opacity-50 p-2 mb-2">
-            <BreadcrumbItem><Link href=""><IconifyIcon icon='tabler:smart-home' className="fs-16 me-1" />Home</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link href="#!"><IconifyIcon icon='tabler:smart-home' className="fs-16 me-1" />Home</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 20
           }}>
@@ -80,13 +80,13 @@ const BreadcrumbWithIcons = () => {
         </nav>
         <nav aria-label="breadcrumb">
           <Breadcrumb className="bg-light bg-opacity-50 p-2 mb-0">
-            <BreadcrumbItem><Link href=""><IconifyIcon icon='tabler:smart-home' className="fs-16 me-1" />Home</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link href="#!"><IconifyIcon icon='tabler:smart-home' className="fs-16 me-1" />Home</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 20
           }}>
               <IconifyIcon icon="tabler:chevron-right" height={16} width={16} />
             </div>
-            <BreadcrumbItem><Link href="">Library</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link href="#!">Library</Link></BreadcrumbItem>
             <div className="mx-1" style={{
             height: 20
           }}>
@@ -118,9 +118,9 @@ const DividersBreadcrumb = () => {
 
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 py-2 d-flex align-items-center gap-1">
-            <li className="breadcrumb-item"><Link href="">Home</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Home</Link></li>
             <IconifyIcon icon="tabler:chevron-right" />
-            <li className="breadcrumb-item"><Link href="">Library</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Library</Link></li>
             <IconifyIcon icon="tabler:chevron-right" />
             <li className="breadcrumb-item active" aria-current="page">Data</li>
           </ol>
@@ -129,9 +129,9 @@ const DividersBreadcrumb = () => {
 
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 py-2 d-flex align-items-center gap-1">
-            <li className="breadcrumb-item"><Link href="">Home</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Home</Link></li>
             <IconifyIcon icon="tabler:chevrons-right" />
-            <li className="breadcrumb-item"><Link href="">Library</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Library</Link></li>
             <IconifyIcon icon="tabler:chevrons-right" />
             <li className="breadcrumb-item active" aria-current="page">Data</li>
           </ol>
@@ -140,9 +140,9 @@ const DividersBreadcrumb = () => {
 
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 py-2 d-flex align-items-center gap-1">
-            <li className="breadcrumb-item"><Link href="">Home</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Home</Link></li>
             <IconifyIcon icon="tabler:arrow-narrow-right" />
-            <li className="breadcrumb-item"><Link href="">Library</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Library</Link></li>
             <IconifyIcon icon="tabler:arrow-narrow-right" />
 
             <li className="breadcrumb-item active" aria-current="page">Data</li>
@@ -151,9 +151,9 @@ const DividersBreadcrumb = () => {
 
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 py-2 d-flex align-items-center gap-1">
-            <li className="breadcrumb-item"><Link href="">Home</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Home</Link></li>
             <IconifyIcon icon="tabler:circle" height={6} width={6} />
-            <li className="breadcrumb-item"><Link href="">Library</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Library</Link></li>
             <IconifyIcon icon="tabler:circle" height={6} width={6} />
 
             <li className="breadcrumb-item active" aria-current="page">Data</li>
@@ -162,9 +162,9 @@ const DividersBreadcrumb = () => {
 
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 py-2 d-flex align-items-center gap-1">
-            <li className="breadcrumb-item"><Link href="">Home</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Home</Link></li>
             <IconifyIcon icon="tabler:slash" />
-            <li className="breadcrumb-item"><Link href="">Library</Link></li>
+            <li className="breadcrumb-item"><Link href="#!">Library</Link></li>
             <IconifyIcon icon="tabler:slash" />
 
             <li className="breadcrumb-item active" aria-current="page">Data</li>

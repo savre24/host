@@ -52,13 +52,13 @@ const TermsPage = () => {
                     <p className="fs-5 fw-semibold">If you have any questions about these Terms &amp; Conditions, please contact us at :</p>
                     <ol className="ps-3 d-flex flex-column gap-1">
                       <li>
-                        <p className="mb-0"><span className="text-dark fw-semibold">Email : </span> <Link href="">ocenbycoderthemes@mail.com</Link></p>
+                        <p className="mb-0"><span className="text-dark fw-semibold">Email : </span> <Link href="#!">ocenbycoderthemes@mail.com</Link></p>
                       </li>
                       <li>
-                        <p className="mb-0"><span className="text-dark fw-semibold">Contact Number : </span> <Link href="">+001 364-364-000</Link></p>
+                        <p className="mb-0"><span className="text-dark fw-semibold">Contact Number : </span> <Link href="#!">+001 364-364-000</Link></p>
                       </li>
                       <li>
-                        <p className="mb-0"><span className="text-dark fw-semibold">Location : </span> <Link href="">3469 Beech Street Oakland, CA 94607</Link></p>
+                        <p className="mb-0"><span className="text-dark fw-semibold">Location : </span> <Link href="#!">3469 Beech Street Oakland, CA 94607</Link></p>
                       </li>
                     </ol>
                     <p className="mb-0">By using our website, you acknowledge that you have read, understood, and agree to be bound by these Terms &amp; Conditions.</p>

@@ -11,9 +11,9 @@ const Footer = () => {
           </Col>
           <Col md={6}>
             <div className="text-md-end footer-links d-none d-md-block">
-              <Link href="">About</Link>
-              <Link href="">Support</Link>
-              <Link href="">Contact Us</Link>
+              <Link href="#!">About</Link>
+              <Link href="#!">Support</Link>
+              <Link href="#!">Contact Us</Link>
             </div>
           </Col>
         </Row>

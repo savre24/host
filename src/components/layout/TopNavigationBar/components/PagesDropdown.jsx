@@ -43,7 +43,7 @@ const PagesDropdown = () => {
                 <ul className="list-unstyled megamenu-list">
                   {extraPages.map((item, idx) => <li key={idx} className='d-flex arrow-none align-items-center'>
                         <IconifyIcon icon='tabler:chevron-right' />
-                        <Link href="">{item}</Link>
+                        <Link href="#!">{item}</Link>
                       </li>)}
                   <li className="arrow-none align-items-center">
                   <IconifyIcon icon='tabler:chevron-right' />
