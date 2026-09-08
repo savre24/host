@@ -27,7 +27,7 @@ const Error500Page = () => {
               <Link href="/" className="btn btn-primary">Back to Home <IconifyIcon icon='tabler:home' className="ms-1" /></Link>
             </div>
             <p className="mt-3 mb-0">
-             {currentYear} © Greeva - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
+             {currentYear} © Hosting Space India
             </p>
           </Card>
         </Col>

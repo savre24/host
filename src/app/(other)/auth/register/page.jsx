@@ -17,7 +17,7 @@ const RegisterPage = () => {
               <Image src={logoDark} alt="dark logo" height={26} className="logo-dark" />
               <Image src={logo} alt="logo light" height={26} className="logo-light" />
             </a>
-            <h4 className="fw-semibold mb-2 fs-18">Welcome to Greeva Admin</h4>
+            <h4 className="fw-semibold mb-2 fs-18">Welcome to Hosting Space India</h4>
             <p className="text-muted mb-4">Enter your name , email address and password to access account.</p>
             <form action="/" className="text-start mb-3">
               <div className="mb-3">
@@ -44,7 +44,7 @@ const RegisterPage = () => {
             </form>
             <p className="text-nuted fs-14 mb-4">Already have an account? <Link href="/auth/login" className="fw-semibold text-danger ms-1">Login !</Link></p>
             <p className="mt-auto mb-0">
-             {currentYear} © Greeva - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
+             {currentYear} © Hosting Space India
             </p>
           </Card>
         </Col>

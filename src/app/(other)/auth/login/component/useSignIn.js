@@ -33,7 +33,7 @@ const useSignIn = () => {
       email: values?.email,
       password: values?.password
     }).then(async res => {
-      if (res?.ok) {
+      if (res?.ok && !res?.error) {
         const session = await getSession();
         if (session?.user?.role === 'CLIENT') {
           push(queryParams['redirectTo'] ?? '/client/dashboard');
@@ -41,6 +41,9 @@ const useSignIn = () => {
           push(queryParams['redirectTo'] ?? '/dashboard');
         }
       } else {
+        import('react-toastify').then(({ toast }) => {
+          toast.error(res?.error || 'Invalid email or password');
+        });
         setLoading(false);
       }
     });

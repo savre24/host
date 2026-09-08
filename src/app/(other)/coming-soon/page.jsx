@@ -35,7 +35,7 @@ const ComingSoonPage = () => {
               </Row>
               <p className="text-muted">Sign up now to get early launch notification of our launch date !</p>
               <p className="mt-3 mb-0">
-               {currentYear} © Greeva - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
+               {currentYear} © Hosting Space India
               </p>
             </Card>
           </Col>

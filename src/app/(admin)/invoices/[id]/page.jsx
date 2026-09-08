@@ -1,4 +1,5 @@
 import { getInvoiceById } from '@/app/actions/billing';
+import { getBusinessSetting } from '@/app/actions/settings';
 import Image from 'next/image';
 import React from 'react';
 import logoDark from '@/assets/images/logo-dark.png';
@@ -26,6 +27,8 @@ const ViewInvoicePage = async ({ params }) => {
   const client = invoice.client;
   const user = client.user;
   
+  const { data: businessSetting } = await getBusinessSetting();
+  
   const totalPaid = invoice.payments ? invoice.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
   const balanceDue = invoice.total - totalPaid;
 
@@ -47,7 +50,11 @@ const ViewInvoicePage = async ({ params }) => {
             <CardBody>
               <div className="d-flex align-items-start justify-content-between mb-4">
                 <div>
-                  <Image src={logoDark} alt="dark logo" height={24} />
+                  {businessSetting?.logoUrl ? (
+                    <img src={businessSetting.logoUrl} alt="Logo" height={24} />
+                  ) : (
+                    <h3 className="m-0 fw-bolder fs-24">{businessSetting?.companyName || 'Company Name'}</h3>
+                  )}
                 </div>
                 <div className="text-end">
                   {invoice.status === 'PAID' && <span className="badge bg-success-subtle text-success px-2 py-1 fs-12 mb-3">Paid</span>}
@@ -196,7 +203,11 @@ const ViewInvoicePage = async ({ params }) => {
               </div>
               <div className="mt-4 text-end">
                 <div className="d-inline-block text-center">
-                  <Image src={signature} alt="signature" height={40} />
+                  {businessSetting?.companyName ? (
+                    <h4 className="mb-0 fs-18 fw-bolder" style={{ fontFamily: 'cursive' }}>{businessSetting.companyName}</h4>
+                  ) : (
+                    <Image src={signature} alt="signature" height={40} />
+                  )}
                   <h5 className="mb-0 mt-2 fs-14">Authorized Signatory</h5>
                 </div>
               </div>

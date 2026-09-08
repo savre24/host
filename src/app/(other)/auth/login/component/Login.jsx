@@ -55,7 +55,7 @@ const Login = () => {
                 <TextFormInput control={control} name="email" placeholder="Enter your email" className="bg-light bg-opacity-50 border-light py-2" label="Email" />
               </div>
               <div className="mb-3">
-                <TextFormInput control={control} name="password" placeholder="Enter your password" className="bg-light bg-opacity-50 border-light py-2" label="Password" />
+                <TextFormInput control={control} name="password" type="password" placeholder="Enter your password" className="bg-light bg-opacity-50 border-light py-2" label="Password" />
               </div>
               <div className="d-flex justify-content-between mb-3">
                 <div className="form-check">

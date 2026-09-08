@@ -4,7 +4,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 import '@/assets/scss/app.scss';
 export const metadata = {
   title: {
-    template: '%s | Greeva NextJs - Responsive Bootstrap 5 Admin Dashboard',
+    template: '%s | Hosting Space India',
     default: DEFAULT_PAGE_TITLE
   },
   description: 'A fully featured admin theme which can be used to build CRM, CMS, etc.'

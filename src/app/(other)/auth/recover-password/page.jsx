@@ -30,7 +30,7 @@ const RecoverPasswordPage = () => {
             </form>
             <p className="text-muted fs-14 mb-4">Back To <Link href="/auth/login" className="fw-semibold text-danger ms-1">Login !</Link></p>
             <p className="mt-auto mb-0">
-             {currentYear} © Greeva - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
+             {currentYear} © Hosting Space India
             </p>
           </Card>
         </Col>
