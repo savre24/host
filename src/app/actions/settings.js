@@ -51,7 +51,7 @@ export async function updateTaxSetting(data) {
     }
 
     revalidatePath('/settings');
-    return { success: true, data: setting };
+    return { success: true };
   } catch (error) {
     console.error('Error updating tax settings:', error);
     return { error: 'Failed to update tax settings' };
@@ -90,7 +90,7 @@ export async function updateBusinessSetting(data) {
     }
     
     revalidatePath('/settings');
-    return { success: true, data: setting };
+    return { success: true };
   } catch (error) {
     console.error('Error updating business settings:', error);
     return { error: 'Failed to update business settings' };
@@ -133,7 +133,7 @@ export async function updatePaymentGatewaySetting(data) {
     }
     
     revalidatePath('/settings');
-    return { success: true, data: setting };
+    return { success: true };
   } catch (error) {
     console.error('Error updating payment gateway settings:', error);
     return { error: 'Failed to update payment gateway settings' };
