@@ -70,7 +70,7 @@ const Login = () => {
             </form>
             <p className="text-muted fs-14 mb-4">Don't have an account? <Link href="/auth/register" className="fw-semibold text-danger ms-1">Sign Up !</Link></p>
             <p className="mt-auto mb-0">
-              {currentYear} © Greeva - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
+              {currentYear} © Client Portal
             </p>
           </Card>
         </Col>
