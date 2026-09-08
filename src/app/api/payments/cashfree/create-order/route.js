@@ -1,0 +1,87 @@
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { Cashfree, CFEnvironment } from 'cashfree-pg';
+
+const prisma = new PrismaClient();
+
+export async function POST(req) {
+  try {
+    const { invoiceId } = await req.json();
+
+    if (!invoiceId) {
+      return NextResponse.json({ error: 'Invoice ID is required' }, { status: 400 });
+    }
+
+    // 1. Fetch the invoice and client details
+    const invoice = await prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: {
+        client: true
+      }
+    });
+
+    if (!invoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+    }
+
+    if (invoice.status === 'PAID') {
+      return NextResponse.json({ error: 'Invoice is already paid' }, { status: 400 });
+    }
+
+    // 2. Fetch Cashfree Settings
+    const gatewaySetting = await prisma.paymentGatewaySetting.findFirst({
+      where: { provider: 'CASHFREE', isActive: true }
+    });
+
+    if (!gatewaySetting || !gatewaySetting.appId || !gatewaySetting.secretKey) {
+      return NextResponse.json({ error: 'Payment gateway is not configured or active' }, { status: 500 });
+    }
+
+    // 3. Configure Cashfree SDK
+    Cashfree.XClientId = gatewaySetting.appId;
+    Cashfree.XClientSecret = gatewaySetting.secretKey;
+    Cashfree.XEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+
+    // 4. Create Order Payload
+    const orderId = `order_${invoice.id.substring(0, 8)}_${Date.now()}`;
+    const orderAmount = invoice.total;
+    
+    // Ensure amount is formatted to 2 decimal places
+    const formattedAmount = Number(orderAmount).toFixed(2);
+
+    const request = {
+      order_amount: formattedAmount,
+      order_currency: 'INR',
+      order_id: orderId,
+      customer_details: {
+        customer_id: invoice.clientId.substring(0, 10),
+        customer_name: `${invoice.client.firstName} ${invoice.client.lastName}`,
+        customer_email: invoice.client.email,
+        customer_phone: invoice.client.phone || '9999999999',
+      },
+      order_meta: {
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/client/payments/verify?order_id={order_id}&invoice_id=${invoice.id}`,
+      },
+      order_tags: {
+        invoice_id: invoice.id
+      }
+    };
+
+    // 5. Create Order using Cashfree SDK
+    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+    
+    if (response && response.data) {
+      return NextResponse.json({
+        success: true,
+        payment_session_id: response.data.payment_session_id,
+        order_id: response.data.order_id
+      });
+    } else {
+      throw new Error('Failed to create Cashfree order');
+    }
+
+  } catch (error) {
+    console.error('Cashfree Order Creation Error:', error?.response?.data || error);
+    return NextResponse.json({ error: 'Failed to initiate payment process' }, { status: 500 });
+  }
+}
