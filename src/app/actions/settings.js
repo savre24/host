@@ -20,7 +20,9 @@ export async function getTaxSetting() {
       });
     }
     
-    return { success: true, data: setting };
+    // Convert Prisma object to plain object to avoid Next.js serialization errors with Dates
+    const plainSetting = setting ? JSON.parse(JSON.stringify(setting)) : null;
+    return { success: true, data: plainSetting };
   } catch (error) {
     console.error('Error fetching tax setting:', error);
     return { error: 'Failed to fetch tax settings' };
@@ -66,7 +68,8 @@ export async function getBusinessSetting() {
         data: {}
       });
     }
-    return { success: true, data: setting };
+    const plainSetting = setting ? JSON.parse(JSON.stringify(setting)) : null;
+    return { success: true, data: plainSetting };
   } catch (error) {
     console.error('Error fetching business settings:', error);
     return { error: 'Failed to fetch business settings' };
@@ -107,7 +110,8 @@ export async function getPaymentGatewaySetting() {
         data: { provider: 'CASHFREE' }
       });
     }
-    return { success: true, data: setting };
+    const plainSetting = setting ? JSON.parse(JSON.stringify(setting)) : null;
+    return { success: true, data: plainSetting };
   } catch (error) {
     console.error('Error fetching payment gateway settings:', error);
     return { error: 'Failed to fetch payment gateway settings' };
