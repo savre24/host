@@ -46,6 +46,11 @@ const useSignIn = () => {
         });
         setLoading(false);
       }
+    }).catch(error => {
+      import('react-toastify').then(({ toast }) => {
+        toast.error('Network error or server timeout. Please try again.');
+      });
+      setLoading(false);
     });
   });
   return {

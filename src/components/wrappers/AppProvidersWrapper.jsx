@@ -1,6 +1,7 @@
 'use client';
 
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import dynamic from 'next/dynamic';
 import { EmailProvider } from '@/context/useEmailContext';
 import { SessionProvider } from 'next-auth/react';
