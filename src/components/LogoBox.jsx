@@ -34,17 +34,13 @@ const LogoBox = () => {
           {customLogo ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={customLogo} alt="logo" style={{ height: 'auto', maxHeight: '50px', maxWidth: '220px', objectFit: 'contain', verticalAlign: 'middle' }} />
-          ) : (
-            <Image width={109} height={22} src={logo} alt="logo" />
-          )}
+          ) : null}
         </span>
         <span className="logo-sm">
           {customIcon ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={customIcon} alt="small logo" style={{ height: 'auto', maxHeight: '30px', maxWidth: '50px', objectFit: 'contain', verticalAlign: 'middle' }} />
-          ) : (
-            <Image width={19} height={24} src={logoSm} alt="small logo" />
-          )}
+          ) : null}
         </span>
       </span>
       <span className="logo-dark">
@@ -52,17 +48,13 @@ const LogoBox = () => {
           {customLogo ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={customLogo} alt="logo" style={{ height: 'auto', maxHeight: '50px', maxWidth: '220px', objectFit: 'contain', verticalAlign: 'middle' }} />
-          ) : (
-            <Image width={109} height={22} src={logoDark} alt="dark logo" />
-          )}
+          ) : null}
         </span>
         <span className="logo-sm">
           {customIcon ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={customIcon} alt="small logo" style={{ height: 'auto', maxHeight: '30px', maxWidth: '50px', objectFit: 'contain', verticalAlign: 'middle' }} />
-          ) : (
-            <Image width={19} height={24} src={logoSm} alt="small logo" />
-          )}
+          ) : null}
         </span>
       </span>
     </a>;

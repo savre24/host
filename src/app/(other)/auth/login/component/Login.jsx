@@ -41,12 +41,7 @@ const Login = () => {
               {customLogo ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={customLogo} alt="logo" style={{ maxHeight: '45px', maxWidth: '200px', objectFit: 'contain' }} />
-              ) : (
-                <>
-                  <Image src={logoDark} alt="dark logo" height={26} className="logo-dark" />
-                  <Image src={logo} alt="logo light" height={26} className="logo-light" />
-                </>
-              )}
+              ) : null}
             </a>
             <h4 className="fw-semibold mb-2 fs-18">Log in to your account</h4>
             <p className="text-muted mb-4">Enter your email address and password to access admin panel.</p>
