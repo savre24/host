@@ -15,7 +15,7 @@ const TaxSettingsForm = ({ initialData }) => {
     const data = Object.fromEntries(formData.entries());
     
     // Parse boolean manually since checkbox omitted means false
-    data.isEnabled = e.target.isEnabled.checked;
+    data.isEnabled = isEnabled;
 
     startTransition(async () => {
       const result = await updateTaxSetting(data);
