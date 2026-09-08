@@ -50,7 +50,7 @@ const ViewClientInvoicePage = async ({ params }) => {
               <div className="d-flex align-items-start justify-content-between mb-4">
                 <div>
                   {businessSetting?.logoUrl ? (
-                    <img src={businessSetting.logoUrl} alt="Logo" height={24} />
+                    <img src={businessSetting.logoUrl} alt="Logo" style={{ height: 'auto', maxHeight: '60px', maxWidth: '250px', objectFit: 'contain' }} />
                   ) : (
                     <h3 className="m-0 fw-bolder fs-24">{businessSetting?.companyName || 'Company Name'}</h3>
                   )}
@@ -201,14 +201,7 @@ const ViewClientInvoicePage = async ({ params }) => {
                 </p>
               </div>
               <div className="mt-4 text-end">
-                <div className="d-inline-block text-center">
-                  {businessSetting?.companyName ? (
-                    <h4 className="mb-0 fs-18 fw-bolder" style={{ fontFamily: 'cursive' }}>{businessSetting.companyName}</h4>
-                  ) : (
-                    <Image src={signature} alt="signature" height={40} />
-                  )}
-                  <h5 className="mb-0 mt-2 fs-14">Authorized Signatory</h5>
-                </div>
+                <p className="text-muted fs-12 mb-0">This is a computer generated bill and does not require a signature.</p>
               </div>
             </CardBody>
           </Card>

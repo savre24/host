@@ -7,7 +7,7 @@ import ThemeCustomizeToggle from '@/components/ThemeCustomizeToggle';
 import ThemeModeToggle from './components/ThemeModeToggle';
 import ProfileDropdown from './components/ProfileDropdown';
 import LeftSideBarToggle from './components/LeftSideBarToggle';
-import PagesDropdown from './components/PagesDropdown';
+
 import HorizontalToggle from './components/HorizontalToggle';
 const TopNavigationBar = () => {
   return <header className="app-topbar">
@@ -24,7 +24,7 @@ const TopNavigationBar = () => {
             <span className="me-2">Search something..</span>
             <span className="ms-auto fw-medium">⌘K</span>
           </div>
-          <PagesDropdown />
+
         </div>
         <div className="d-flex align-items-center gap-2">
           <div className="topbar-item d-flex d-xl-none">

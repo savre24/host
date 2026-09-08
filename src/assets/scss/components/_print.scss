@@ -4,20 +4,30 @@
 
 // Used invoice page
 @media print {
+    @page {
+        margin: 0; /* Hide browser headers and footers */
+    }
+
     .sidenav-menu,
     .page-title-head,
     .app-topbar,
     .footer {
         display: none !important;
     }
+    
     .card-body,
-    .page-content,
-    body {
+    .page-content {
         padding: 0;
+        margin: 0;
+    }
+    
+    body {
+        padding: 1cm; /* Prevents text from sticking to the edge of the paper */
         margin: 0;
     }
 
     .card {
         box-shadow: none;
+        border: none;
     }
 }
