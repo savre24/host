@@ -3,7 +3,7 @@
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import React from 'react';
 import { bubble3DChartOpts, simpleBubbleChartOpts } from '../data';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { Col, Row } from 'react-bootstrap';
 const SimpleBubbleChart = () => {
   return <ComponentContainerCard title='Simple Bubble Chart'>

@@ -1,7 +1,7 @@
 'use client';
 
 import ComponentContainerCard from "@/components/ComponentContainerCard";
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from "@/components/ReactApexChart";
 import { Col, Row } from "react-bootstrap";
 import { basicHeatmapChartOpts, HeatmapColorRangeChartOpts, HeatmapRangeShadesChartOpts, multipleSeriesHeatmapChartOpts } from "../data";
 const BasicHeatmapChart = () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { currency } from '@/context/constants';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
 import { chart1Opts, chart2Opts, chart3Opts, chart4Opts, chart5Opts, chart6Opts, chart7Opts, chart8Opts, spark1ChartOpts, spark2ChartOpts, spark3ChartOpts } from '../data';
 const ChangeChart1 = () => {

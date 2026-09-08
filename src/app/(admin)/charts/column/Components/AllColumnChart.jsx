@@ -1,7 +1,7 @@
 'use client';
 
 import ComponentContainerCard from "@/components/ComponentContainerCard";
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from "@/components/ReactApexChart";
 import { basicColumnChartOpts, columnGroupChartOpts, columnMarkersChartOpts, datalabelsColumnChartOpts, distributedColumnChartOpts, fullStackedColumnChartOpts, negativeColumnChartOpts, rangeColumnChartOpts, rotateColumnChartOpts, stackedColumnChartOpts } from "../data";
 import DynamicLoaded from "./DynamicLoaded";
 import { Col, Row } from "react-bootstrap";

@@ -2,7 +2,7 @@
 
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { Button, Col, Row } from 'react-bootstrap';
 import { donutUpdateOpts, gradientDonutChartOpts, imagePieChartOpts, monochromePieChartOpts, patternedDonutChartOpts, simpleDonutChartOpts, simplePieChartOpts } from '../data';
 const SimplePieChart = () => {

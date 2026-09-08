@@ -1,7 +1,7 @@
 'use client';
 
 import ComponentContainerCard from "@/components/ComponentContainerCard";
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from "@/components/ReactApexChart";
 import { Col, Row } from "react-bootstrap";
 import { annotationsChartOpts, brushChartOpts, brushChartOpts2, dashedLineChartOpts, gradientLineChartOpts, lineWithDataChartOpts, missingNullValuesChartOpts, simpleLineChartOpts, stepLineChartOpts, syncingChartOpts, syncingChartOpts2, zoomableTimeseriesChartOpts } from "../data";
 const SimpleLineChart = () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import ComponentContainerCard from "@/components/ComponentContainerCard";
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from "@/components/ReactApexChart";
 import { basicChartOpts, dateTimeChartChartOpts, NegativeValuesChartOpts, nullValuesChartOpts, splineChartOpts, stackedChartOpts, timeSeriesChartOpts } from "../data";
 import { Col, Row } from "react-bootstrap";
 const BasicAreaChart = () => {

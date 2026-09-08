@@ -2,7 +2,7 @@
 
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { Button, Col, Row } from 'react-bootstrap';
 import { basicRadarChartOpts, multipleSeriesOpts, polygonRadarChartOpts } from '../data';
 const BasicRadarChart = () => {

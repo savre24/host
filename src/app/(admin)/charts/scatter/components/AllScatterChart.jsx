@@ -2,7 +2,7 @@
 
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import React from 'react';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { dateTimeScatterChartOpts, scatterChartOpts, scatterImagesChartOpts } from '../data';
 import { Col, Row } from 'react-bootstrap';
 const ScatterChart = () => {

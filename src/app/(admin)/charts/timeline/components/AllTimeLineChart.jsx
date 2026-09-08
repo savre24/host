@@ -1,7 +1,7 @@
 'use client';
 
 import ComponentContainerCard from '@/components/ComponentContainerCard';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from '@/components/ReactApexChart';
 import { advancedTimelineChartOpts, basicTimelineChartOpts, distributedTimelineChartOpts, groupTimelineChartOpts, multiSeriesTimelineChartOpts } from '../data';
 import { Col, Row } from 'react-bootstrap';
 const BasicTimeline = () => {
