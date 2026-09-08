@@ -35,14 +35,18 @@ export async function updateTaxSetting(data) {
     const { isEnabled, percentage, taxName } = data;
     
     let setting = await prisma.taxSetting.findFirst();
+    
+    const parsedPercentage = percentage !== undefined ? parseFloat(percentage) : (setting?.percentage || 0);
+    const finalTaxName = taxName !== undefined ? taxName : (setting?.taxName || 'GST');
+
     if (setting) {
       setting = await prisma.taxSetting.update({
         where: { id: setting.id },
-        data: { isEnabled, percentage: parseFloat(percentage), taxName }
+        data: { isEnabled, percentage: parsedPercentage, taxName: finalTaxName }
       });
     } else {
       setting = await prisma.taxSetting.create({
-        data: { isEnabled, percentage: parseFloat(percentage), taxName }
+        data: { isEnabled, percentage: parsedPercentage, taxName: finalTaxName }
       });
     }
 
