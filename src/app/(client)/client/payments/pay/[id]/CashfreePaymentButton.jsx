@@ -11,27 +11,7 @@ const CashfreePaymentButton = ({ invoice }) => {
   const [cashfree, setCashfree] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Initialize Cashfree SDK
-    const initCashfree = async () => {
-      // In a real app, you might want to fetch the environment setting from an API
-      // For this demo, we initialize it. The backend strictly enforces sandbox/prod.
-      try {
-        const cashfreeInstance = await load({ mode: 'sandbox' }); 
-        setCashfree(cashfreeInstance);
-      } catch (err) {
-        console.error("Cashfree SDK load error:", err);
-      }
-    };
-    initCashfree();
-  }, []);
-
   const handlePayment = async () => {
-    if (!cashfree) {
-      toast.error('Payment gateway is still loading. Please wait a moment.');
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
@@ -48,13 +28,17 @@ const CashfreePaymentButton = ({ invoice }) => {
         throw new Error(data.details || data.error || 'Failed to initialize payment');
       }
 
+      // Initialize Cashfree SDK dynamically based on environment returned from backend
+      const mode = data.environment === 'PRODUCTION' ? 'production' : 'sandbox';
+      const cashfreeInstance = await load({ mode });
+
       // 2. Open Cashfree Checkout Modal
       const checkoutOptions = {
         paymentSessionId: data.payment_session_id,
         redirectTarget: '_modal', // Opens seamlessly in a modal without redirecting
       };
 
-      cashfree.checkout(checkoutOptions).then((result) => {
+      cashfreeInstance.checkout(checkoutOptions).then((result) => {
         if (result.error) {
           // Payment failed or user closed modal
           toast.error(result.error.message || 'Payment cancelled or failed');

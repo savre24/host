@@ -40,6 +40,7 @@ export async function POST(req) {
     // 3. Configure Cashfree SDK
     const cashfreeEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
     const cashfree = new Cashfree(cashfreeEnvironment, gatewaySetting.appId, gatewaySetting.secretKey);
+    cashfree.XApiVersion = "2023-08-01"; // Explicitly set for compatibility with cashfree-js
 
     // 4. Create Order Payload
     const orderId = `order_${invoice.id.replace(/-/g, '').substring(0, 8)}_${Date.now()}`;
@@ -81,7 +82,8 @@ export async function POST(req) {
       return NextResponse.json({
         success: true,
         payment_session_id: response.data.payment_session_id,
-        order_id: response.data.order_id
+        order_id: response.data.order_id,
+        environment: gatewaySetting.environment
       });
     } else {
       throw new Error('Failed to create Cashfree order');
