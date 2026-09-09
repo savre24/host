@@ -16,7 +16,9 @@ export async function POST(req) {
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },
       include: {
-        client: true
+        client: {
+          include: { user: true }
+        }
       }
     });
 
@@ -55,8 +57,8 @@ export async function POST(req) {
       order_id: orderId,
       customer_details: {
         customer_id: invoice.clientId.substring(0, 10),
-        customer_name: `${invoice.client.firstName} ${invoice.client.lastName}`,
-        customer_email: invoice.client.email,
+        customer_name: invoice.client.user?.name || invoice.client.companyName || 'Client',
+        customer_email: invoice.client.user?.email || 'no-email@example.com',
         customer_phone: invoice.client.phone || '9999999999',
       },
       order_meta: {

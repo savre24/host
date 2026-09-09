@@ -25,7 +25,8 @@ export async function getInvoices(searchQuery = '') {
       include: {
         client: {
           include: { user: true }
-        }
+        },
+        items: true
       },
       orderBy: { createdAt: 'desc' },
     });

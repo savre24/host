@@ -31,12 +31,41 @@ export async function getClientDashboardStats(userId) {
       where: { clientId: userId, status: 'OPEN' }
     });
 
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const latestInvoice = await prisma.invoice.findFirst({
+      where: { clientId: profile.id, status: { not: 'DRAFT' } },
+      orderBy: { invoiceDate: 'desc' },
+      take: 1
+    });
+
+    const pendingInvoicesList = await prisma.invoice.findMany({
+      where: { clientId: profile.id, status: { in: ['PENDING', 'OVERDUE', 'PARTIALLY_PAID'] } },
+      orderBy: { dueDate: 'asc' },
+      take: 5
+    });
+
+    const upcomingRenewals = await prisma.clientService.findMany({
+      where: { 
+        clientId: profile.id, 
+        status: { in: ['ACTIVE', 'EXPIRING_SOON'] },
+        expiryDate: { lte: thirtyDaysFromNow, not: null }
+      },
+      include: { product: true },
+      orderBy: { expiryDate: 'asc' },
+      take: 5
+    });
+
     return {
       success: true,
       data: {
         activeServices,
         pendingBalance: pendingInvoices._sum.total || 0,
-        openTickets
+        openTickets,
+        latestInvoice,
+        pendingInvoicesList,
+        upcomingRenewals
       }
     };
   } catch (error) {

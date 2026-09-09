@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import DomainActionsClient from './DomainActionsClient';
 import DomainInfoEditableClient from './DomainInfoEditableClient';
 import Link from 'next/link';
+import PageTitle from '@/components/PageTitle';
 
 export const metadata = {
   title: 'Service Details'
@@ -22,16 +23,7 @@ export default async function ClientServiceDetailsPage({ params }) {
 
   return (
     <>
-      <div className="row mb-3">
-        <div className="col-12">
-          <div className="page-title-box">
-            <h4 className="page-title">
-              <Link href="/client/services" className="text-muted me-2">Services</Link> 
-              / {serviceName}
-            </h4>
-          </div>
-        </div>
-      </div>
+      <PageTitle title={serviceName} subTitle="Services" />
 
       <div className="row">
         <div className="col-xl-8 col-lg-10">

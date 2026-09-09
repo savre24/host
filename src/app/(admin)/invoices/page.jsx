@@ -46,6 +46,7 @@ const InvoicesList = async ({ searchParams }) => {
           <tr>
             <th>Invoice #</th>
             <th>Client</th>
+            <th>Service</th>
             <th>Date</th>
             <th>Due Date</th>
             <th>Total Amount</th>
@@ -65,6 +66,12 @@ const InvoicesList = async ({ searchParams }) => {
                 <Link href={`/clients/${inv.client.user.id}`} className="text-reset fw-medium">
                   {inv.client.user.name || inv.client.companyName}
                 </Link>
+              </td>
+              <td>
+                <span className="text-muted text-truncate d-inline-block" style={{ maxWidth: '200px' }}>
+                  {inv.items?.[0]?.description || 'N/A'}
+                  {inv.items?.length > 1 && ` (+${inv.items.length - 1})`}
+                </span>
               </td>
               <td>{new Date(inv.invoiceDate).toLocaleDateString()}</td>
               <td>{new Date(inv.dueDate).toLocaleDateString()}</td>

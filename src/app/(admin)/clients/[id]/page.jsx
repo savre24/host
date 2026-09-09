@@ -90,7 +90,12 @@ const ClientViewPage = async ({ params }) => {
                 <tbody>
                   {profile.services.map((svc) => (
                     <tr key={svc.id}>
-                      <td>{svc.product?.name || 'Unknown Service'}</td>
+                      <td>
+                        <div className="fw-medium">{svc.product?.name || 'Unknown Service'}</div>
+                        {svc.customName && (
+                          <div className="text-muted small mt-1">{svc.customName}</div>
+                        )}
+                      </td>
                       <td>
                         <span className={`badge ${svc.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`}>
                           {svc.status}
