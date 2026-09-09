@@ -31,7 +31,7 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
     let tax = 0;
     let disc = 0;
 
-    const newItems = items.map(item => {
+    items.forEach(item => {
       const q = parseFloat(item.quantity) || 0;
       const p = parseFloat(item.unitPrice) || 0;
       const d = parseFloat(item.discount) || 0;
@@ -40,13 +40,10 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
       const basePrice = q * p;
       const rowTotalAfterDiscount = basePrice - d;
       const rowTax = (rowTotalAfterDiscount * tRate) / 100;
-      const finalRowTotal = rowTotalAfterDiscount + rowTax;
 
       sub += basePrice;
       disc += d;
       tax += rowTax;
-
-      return { ...item, total: finalRowTotal };
     });
 
     setTotals({
@@ -98,7 +95,20 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
     data.taxAmount = totals.taxAmount;
     data.total = totals.grandTotal;
 
-    const validItems = items.filter(item => item.description.trim() !== '');
+    const validItems = items.filter(item => item.description.trim() !== '').map(item => {
+      const q = parseFloat(item.quantity) || 0;
+      const p = parseFloat(item.unitPrice) || 0;
+      const d = parseFloat(item.discount) || 0;
+      const tRate = parseFloat(item.taxRate) || 0;
+
+      const basePrice = q * p;
+      const rowTotalAfterDiscount = basePrice - d;
+      const rowTax = (rowTotalAfterDiscount * tRate) / 100;
+      const finalRowTotal = rowTotalAfterDiscount + rowTax;
+      
+      return { ...item, total: finalRowTotal };
+    });
+    
     if (validItems.length === 0) {
       toast.error('Please add at least one item to the invoice.');
       return;
@@ -243,7 +253,7 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
                       />
                     </td>
                     <td className="align-middle fw-medium text-end">
-                      ₹{item.total ? item.total.toFixed(2) : '0.00'}
+                      ₹{(((parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0) - (parseFloat(item.discount) || 0)) * (1 + (parseFloat(item.taxRate) || 0) / 100)).toFixed(2)}
                     </td>
                     <td className="align-middle text-center">
                       <Button variant="link" className="text-danger p-0" onClick={() => handleRemoveItem(index)}>
