@@ -54,7 +54,19 @@ export async function POST(req) {
               data: { status: 'PAID' }
             });
             
-            // Create a Payment Record (if you have a Payment model, otherwise ActivityLog)
+            // Create a Payment Record
+            await tx.payment.create({
+              data: {
+                invoiceId: invoice.id,
+                clientId: invoice.clientId,
+                amount: invoice.total,
+                paymentMethod: 'Cashfree',
+                paymentReference: orderId,
+                status: 'COMPLETED'
+              }
+            });
+
+            // Log the activity
             await tx.activityLog.create({
               data: {
                 userId: invoice.clientId,
