@@ -318,8 +318,8 @@ model BusinessSetting {
   phone       String?
   email       String?
   gstNumber   String?
-  logoUrl     String?
-  iconUrl     String?
+  logoUrl     String?  @db.LongText
+  iconUrl     String?  @db.LongText
   updatedAt   DateTime @updatedAt
 }
 
