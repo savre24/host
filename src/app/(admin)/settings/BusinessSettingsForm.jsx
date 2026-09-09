@@ -27,12 +27,17 @@ const BusinessSettingsForm = ({ initialData }) => {
     setIsSubmitting(true);
     setMessage(null);
 
-    const result = await updateBusinessSetting(formData);
-    
-    if (result.success) {
-      setMessage({ type: 'success', text: 'Business settings updated successfully!' });
-    } else {
-      setMessage({ type: 'danger', text: result.error || 'Failed to update settings.' });
+    try {
+      const result = await updateBusinessSetting(formData);
+      
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Business settings updated successfully!' });
+      } else {
+        setMessage({ type: 'danger', text: result.error || 'Failed to update settings.' });
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage({ type: 'danger', text: 'Network error or image is too large. Please try a smaller logo.' });
     }
     
     setIsSubmitting(false);
