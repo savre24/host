@@ -20,12 +20,11 @@ export async function POST(req) {
     }
 
     // 2. Configure Cashfree SDK
-    Cashfree.XClientId = gatewaySetting.appId;
-    Cashfree.XClientSecret = gatewaySetting.secretKey;
-    Cashfree.XEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+    const cashfreeEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+    const cashfree = new Cashfree(cashfreeEnvironment, gatewaySetting.appId, gatewaySetting.secretKey);
 
     // 3. Verify Payment Status with Cashfree API
-    const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
+    const response = await cashfree.PGOrderFetchPayments(orderId);
     
     if (response && response.data && response.data.length > 0) {
       const payments = response.data;

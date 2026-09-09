@@ -140,7 +140,7 @@ export async function updatePaymentGatewaySetting(data) {
           secretKey: secretKey ?? setting.secretKey, 
           environment: environment ?? setting.environment, 
           isActive: isActive === 'true' || isActive === true,
-          onlinePaymentCharge: onlinePaymentCharge ? parseFloat(onlinePaymentCharge) : setting.onlinePaymentCharge
+          onlinePaymentCharge: onlinePaymentCharge !== undefined && onlinePaymentCharge !== null && onlinePaymentCharge !== '' ? parseFloat(onlinePaymentCharge) : setting.onlinePaymentCharge
         }
       });
     } else {

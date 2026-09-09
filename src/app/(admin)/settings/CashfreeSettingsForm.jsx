@@ -11,6 +11,7 @@ const CashfreeSettingsForm = ({ initialData }) => {
     secretKey: initialData?.secretKey || '',
     environment: initialData?.environment || 'TEST',
     isActive: initialData?.isActive || false,
+    onlinePaymentCharge: initialData?.onlinePaymentCharge || 2.0,
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +56,24 @@ const CashfreeSettingsForm = ({ initialData }) => {
               checked={formData.isActive}
               onChange={handleChange}
             />
+          </Form.Group>
+        </Col>
+
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Online Payment Charge (%)</Form.Label>
+            <Form.Control
+              type="number"
+              step="0.01"
+              name="onlinePaymentCharge"
+              value={formData.onlinePaymentCharge}
+              onChange={handleChange}
+              placeholder="e.g. 2.0"
+              required
+            />
+            <Form.Text className="text-muted">
+              This percentage fee will be added to the invoice total for online payments.
+            </Form.Text>
           </Form.Group>
         </Col>
 

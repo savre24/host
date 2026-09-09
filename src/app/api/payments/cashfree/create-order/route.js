@@ -38,9 +38,8 @@ export async function POST(req) {
     }
 
     // 3. Configure Cashfree SDK
-    Cashfree.XClientId = gatewaySetting.appId;
-    Cashfree.XClientSecret = gatewaySetting.secretKey;
-    Cashfree.XEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+    const cashfreeEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
+    const cashfree = new Cashfree(cashfreeEnvironment, gatewaySetting.appId, gatewaySetting.secretKey);
 
     // 4. Create Order Payload
     const orderId = `order_${invoice.id.replace(/-/g, '').substring(0, 8)}_${Date.now()}`;
@@ -68,7 +67,7 @@ export async function POST(req) {
     };
 
     // 5. Create Order using Cashfree SDK
-    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+    const response = await cashfree.PGCreateOrder(request);
     
     if (response && response.data) {
       return NextResponse.json({
