@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { Cashfree, CFEnvironment } from 'cashfree-pg';
-
-const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
@@ -70,8 +68,7 @@ export async function POST(req) {
     };
 
     // 5. Create Order using Cashfree SDK
-    const cashfreeInstance = new Cashfree();
-    const response = await cashfreeInstance.PGCreateOrder("2023-08-01", request);
+    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
     
     if (response && response.data) {
       return NextResponse.json({

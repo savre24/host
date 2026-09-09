@@ -60,6 +60,7 @@ model ProductService {
   renewalPrice Float?
   billingCycle BillingCycle @default(MONTHLY)
   isRenewable  Boolean  @default(true)
+  applyOnlineCharge Boolean @default(true)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -91,6 +92,7 @@ model ClientService {
   status            ServiceStatus @default(ACTIVE)
   notes             String?
   autoRenewReminder Boolean  @default(true)
+  applyOnlineCharge Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -187,6 +189,7 @@ model Invoice {
   subtotal      Float
   discount      Float    @default(0)
   taxAmount     Float    @default(0)
+  onlinePaymentCharge Float @default(0)
   total         Float
   status        InvoiceStatus @default(DRAFT)
   createdAt     DateTime @default(now())
@@ -229,6 +232,7 @@ model Payment {
   paymentDate      DateTime @default(now())
   paymentMethod    String?  // e.g., "Cashfree"
   paymentReference String?  // e.g., Cashfree order ID
+  feeAmount        Float    @default(0)
   status           PaymentStatus @default(COMPLETED)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -329,6 +333,7 @@ model PaymentGatewaySetting {
   appId       String?
   secretKey   String?
   environment String   @default("TEST") // "TEST" or "PRODUCTION"
+  onlinePaymentCharge Float @default(2.0)
   isActive    Boolean  @default(false)
   updatedAt   DateTime @updatedAt
 }

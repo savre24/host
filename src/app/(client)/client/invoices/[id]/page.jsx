@@ -143,6 +143,14 @@ const ViewClientInvoicePage = async ({ params }) => {
                         <td className="text-end">₹{invoice.taxAmount.toFixed(2)}</td>
                       </tr>
                     )}
+                    {invoice.onlinePaymentCharge > 0 && (
+                      <tr>
+                        <td className="fw-medium">Online Payment Charge</td>
+                        <td className="text-end">₹{invoice.onlinePaymentCharge.toFixed(2)}
+                          <div className="fs-10 text-muted">Applied to online payments only</div>
+                        </td>
+                      </tr>
+                    )}
                     <tr className="border-top border-top-dashed fs-16 bg-light">
                       <td className="fw-bold">Total Amount</td>
                       <td className="fw-bold text-end text-primary">₹{invoice.total.toFixed(2)}</td>

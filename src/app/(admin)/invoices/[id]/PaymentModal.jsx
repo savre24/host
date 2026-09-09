@@ -58,8 +58,11 @@ const PaymentModal = ({ invoiceId, balanceDue }) => {
                 max={balanceDue}
                 defaultValue={balanceDue}
               />
-              <Form.Text className="text-muted">
+              <Form.Text className="text-muted d-block">
                 Balance Due: ₹{balanceDue.toFixed(2)}
+              </Form.Text>
+              <Form.Text className="text-info d-block mt-1">
+                Note: Online payment charges are waived for offline payments (e.g., Bank Transfer, Cash).
               </Form.Text>
             </Form.Group>
 

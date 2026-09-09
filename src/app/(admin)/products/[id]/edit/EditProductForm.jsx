@@ -18,6 +18,7 @@ const EditProductForm = ({ product }) => {
     
     // Parse booleans
     data.isRenewable = data.isRenewable === 'on';
+    data.applyOnlineCharge = data.applyOnlineCharge === 'on';
     data.isActive = data.isActive === 'on';
 
     startTransition(async () => {
@@ -85,7 +86,7 @@ const EditProductForm = ({ product }) => {
       </Row>
 
       <Row className="mb-4">
-        <Form.Group as={Col} md="6">
+        <Form.Group as={Col} md="4">
           <Form.Label>Is Renewable?</Form.Label>
           <div className="mt-2">
             <input type="checkbox" id="isRenewable" name="isRenewable" defaultChecked={product.isRenewable} data-switch="success" />
@@ -95,7 +96,17 @@ const EditProductForm = ({ product }) => {
             Does this service require renewal tracking?
           </Form.Text>
         </Form.Group>
-        <Form.Group as={Col} md="6">
+        <Form.Group as={Col} md="4">
+          <Form.Label>Online Charge?</Form.Label>
+          <div className="mt-2">
+            <input type="checkbox" id="applyOnlineCharge" name="applyOnlineCharge" defaultChecked={product.applyOnlineCharge} data-switch="success" />
+            <label htmlFor="applyOnlineCharge" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
+          </div>
+          <Form.Text className="text-muted">
+            Apply online payment fee?
+          </Form.Text>
+        </Form.Group>
+        <Form.Group as={Col} md="4">
           <Form.Label>Status</Form.Label>
           <div className="mt-2">
             <input type="checkbox" id="isActive" name="isActive" defaultChecked={product.isActive} data-switch="success" />

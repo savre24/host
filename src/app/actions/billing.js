@@ -72,7 +72,7 @@ export async function getInvoiceById(id) {
  */
 export async function createInvoice(formData, items) {
   try {
-    const { clientId, invoiceNumber, invoiceDate, dueDate, notes, subtotal, discount, taxAmount, total, status } = formData;
+    const { clientId, invoiceNumber, invoiceDate, dueDate, notes, subtotal, discount, taxAmount, onlinePaymentCharge, total, status } = formData;
     
     // Ensure invoice number is unique
     const existing = await prisma.invoice.findUnique({ where: { invoiceNumber } });
@@ -90,6 +90,7 @@ export async function createInvoice(formData, items) {
         subtotal: parseFloat(subtotal),
         discount: parseFloat(discount),
         taxAmount: parseFloat(taxAmount),
+        onlinePaymentCharge: onlinePaymentCharge ? parseFloat(onlinePaymentCharge) : 0,
         total: parseFloat(total),
         status: status || 'DRAFT',
         items: {
@@ -135,7 +136,7 @@ export async function createInvoice(formData, items) {
  */
 export async function updateInvoice(invoiceId, formData, items) {
   try {
-    const { clientId, invoiceNumber, invoiceDate, dueDate, notes, subtotal, discount, taxAmount, total, status } = formData;
+    const { clientId, invoiceNumber, invoiceDate, dueDate, notes, subtotal, discount, taxAmount, onlinePaymentCharge, total, status } = formData;
     
     // Check if invoice number is taken by another invoice
     const existing = await prisma.invoice.findFirst({ 
@@ -165,6 +166,7 @@ export async function updateInvoice(invoiceId, formData, items) {
         subtotal: parseFloat(subtotal),
         discount: parseFloat(discount),
         taxAmount: parseFloat(taxAmount),
+        onlinePaymentCharge: onlinePaymentCharge ? parseFloat(onlinePaymentCharge) : 0,
         total: parseFloat(total),
         status: status,
         items: {
@@ -257,9 +259,13 @@ export async function recordPayment(invoiceId, formData) {
     });
 
     // Check if total payments now cover the invoice total
+    // If it's an offline payment, the onlinePaymentCharge is waived.
+    const isOnlinePayment = paymentMethod === 'ONLINE' || paymentMethod === 'CASHFREE' || paymentMethod === 'RAZORPAY';
+    const requiredTotal = isOnlinePayment ? invoice.total : (invoice.total - (invoice.onlinePaymentCharge || 0));
+
     const totalPaidSoFar = invoice.payments.reduce((sum, p) => sum + p.amount, 0) + paymentAmount;
     
-    if (totalPaidSoFar >= invoice.total) {
+    if (totalPaidSoFar >= requiredTotal) {
       await prisma.invoice.update({
         where: { id: invoiceId },
         data: { status: 'PAID' }
@@ -345,17 +351,20 @@ export async function generateRenewalInvoice(clientServiceId) {
     // Priority: Client-specific renewal price -> Product renewal price -> Client price -> Product default price
     const renewalAmount = service.renewalPrice ?? service.product.renewalPrice ?? service.price ?? service.product.defaultPrice;
     
-    // Check if an unpaid invoice already exists for this service's current expiry date?
-    // We can just rely on the user not clicking it twice.
-    
-    // Fetch tax settings
+    // Fetch settings
     const { data: taxSetting } = await getTaxSetting();
     const taxRate = taxSetting?.isEnabled ? taxSetting.percentage : 0;
+    
+    const gatewaySetting = await prisma.paymentGatewaySetting.findFirst({ where: { provider: 'CASHFREE' } });
+    const onlinePaymentChargeRate = service.applyOnlineCharge ? (gatewaySetting?.onlinePaymentCharge || 2.0) : 0;
     
     const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
     const invoiceNumber = `INV-${new Date().getFullYear()}-${randomStr}`;
     const taxAmount = (renewalAmount * taxRate) / 100;
-    const total = renewalAmount + taxAmount;
+    
+    const subTotalWithTax = renewalAmount + taxAmount;
+    const onlinePaymentCharge = (subTotalWithTax * onlinePaymentChargeRate) / 100;
+    const total = subTotalWithTax + onlinePaymentCharge;
 
     // We will create the Renewal and Invoice in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -370,6 +379,7 @@ export async function generateRenewalInvoice(clientServiceId) {
           subtotal: renewalAmount,
           discount: 0,
           taxAmount,
+          onlinePaymentCharge,
           total,
           status: 'PENDING',
           items: {

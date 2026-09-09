@@ -7,7 +7,7 @@ import { Button, Col, Form, Row, Table, Card } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate = 18, initialData = null }) => {
+const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate = 18, onlineChargeRate = 2.0, initialData = null }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(null);
@@ -22,8 +22,13 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
     subtotal: initialData?.subtotal || 0, 
     taxAmount: initialData?.taxAmount || 0, 
     discountAmount: initialData?.discount || 0, 
+    onlinePaymentCharge: initialData?.onlinePaymentCharge || 0,
     grandTotal: initialData?.total || 0 
   });
+
+  const [applyOnlineCharge, setApplyOnlineCharge] = useState(
+    initialData ? (initialData.onlinePaymentCharge > 0) : true
+  );
 
   // Calculate totals whenever items change
   useEffect(() => {
@@ -46,13 +51,17 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
       tax += rowTax;
     });
 
+    const subTotalWithTax = sub - disc + tax;
+    const onlineCharge = applyOnlineCharge ? (subTotalWithTax * onlineChargeRate) / 100 : 0;
+
     setTotals({
       subtotal: sub,
       discountAmount: disc,
       taxAmount: tax,
-      grandTotal: sub - disc + tax
+      onlinePaymentCharge: onlineCharge,
+      grandTotal: subTotalWithTax + onlineCharge
     });
-  }, [items]);
+  }, [items, applyOnlineCharge, onlineChargeRate]);
 
   const handleAddItem = () => {
     setItems([...items, { ...emptyItem }]);
@@ -93,6 +102,7 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
     data.subtotal = totals.subtotal;
     data.discount = totals.discountAmount;
     data.taxAmount = totals.taxAmount;
+    data.onlinePaymentCharge = totals.onlinePaymentCharge;
     data.total = totals.grandTotal;
 
     const validItems = items.filter(item => item.description.trim() !== '').map(item => {
@@ -287,6 +297,18 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
               <Form.Check type="radio" id="status-paid" name="status" label="Paid" value="PAID" defaultChecked={initialData?.status === 'PAID'} />
             </div>
           </Form.Group>
+          <Form.Group className="mt-4">
+            <Form.Check 
+              type="checkbox" 
+              id="applyOnlineCharge" 
+              label={`Apply Online Payment Charge (${onlineChargeRate}%)`} 
+              checked={applyOnlineCharge} 
+              onChange={(e) => setApplyOnlineCharge(e.target.checked)} 
+            />
+            <small className="text-muted d-block mt-1">
+              Waived if the customer pays offline (e.g. Bank Transfer).
+            </small>
+          </Form.Group>
         </Col>
         
         <Col md={6}>
@@ -304,6 +326,12 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
                 <span className="text-muted">Tax Amount:</span>
                 <span>₹{totals.taxAmount.toFixed(2)}</span>
               </div>
+              {totals.onlinePaymentCharge > 0 && (
+                <div className="d-flex justify-content-between mb-2">
+                  <span className="text-muted">Online Payment Charge ({onlineChargeRate}%):</span>
+                  <span>₹{totals.onlinePaymentCharge.toFixed(2)}</span>
+                </div>
+              )}
               <hr />
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Grand Total:</h5>

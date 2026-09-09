@@ -1,6 +1,6 @@
 import { getClients } from '@/app/actions/client';
 import { getActiveProducts } from '@/app/actions/product';
-import { getTaxSetting } from '@/app/actions/settings';
+import { getTaxSetting, getPaymentGatewaySetting } from '@/app/actions/settings';
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import PageTitle from '@/components/PageTitle';
 import Link from 'next/link';
@@ -21,6 +21,10 @@ const CreateInvoicePage = async () => {
   // Fetch default tax setting
   const { data: taxSetting } = await getTaxSetting();
   const defaultTaxRate = taxSetting?.isEnabled ? taxSetting.percentage : 0;
+
+  // Fetch gateway settings
+  const { data: gatewaySetting } = await getPaymentGatewaySetting();
+  const onlineChargeRate = gatewaySetting?.onlinePaymentCharge || 2.0;
 
   // Generate a random invoice number like INV-2026-XXXXX
   const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -49,6 +53,7 @@ const CreateInvoicePage = async () => {
                   products={products || []} 
                   defaultInvoiceNumber={autoInvoiceNumber} 
                   defaultTaxRate={defaultTaxRate}
+                  onlineChargeRate={onlineChargeRate}
                 />
               </Col>
             )}

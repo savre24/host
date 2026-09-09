@@ -10,7 +10,7 @@ import { sendWhatsAppMessage, fillWhatsAppTemplate } from '@/app/actions/whatsap
  */
 export async function createProduct(formData) {
   try {
-    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive } = formData;
 
     const newProduct = await prisma.productService.create({
       data: {
@@ -21,6 +21,7 @@ export async function createProduct(formData) {
         renewalPrice: renewalPrice ? parseFloat(renewalPrice) : null,
         billingCycle,
         isRenewable: Boolean(isRenewable),
+        applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
         isActive: Boolean(isActive),
       },
     });
@@ -38,7 +39,7 @@ export async function createProduct(formData) {
  */
 export async function updateProduct(id, formData) {
   try {
-    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive } = formData;
 
     const updatedProduct = await prisma.productService.update({
       where: { id },
@@ -50,6 +51,7 @@ export async function updateProduct(id, formData) {
         renewalPrice: renewalPrice ? parseFloat(renewalPrice) : null,
         billingCycle,
         isRenewable: Boolean(isRenewable),
+        applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
         isActive: Boolean(isActive),
       },
     });
@@ -136,31 +138,32 @@ export async function getActiveProducts() {
 /**
  * Assigns a service to a client
  */
-export async function assignServiceToClient(clientProfileId, formData) {
-  try {
-    const { productId, customName, price, renewalPrice, billingCycle, startDate, expiryDate, notes, autoRenewReminder, status, autoInvoice } = formData;
-    const priceFloat = parseFloat(price);
-    const renewalPriceFloat = renewalPrice ? parseFloat(renewalPrice) : null;
-    const nextDueDateObj = expiryDate ? new Date(expiryDate) : null;
-
-    const profile = await prisma.clientProfile.findUnique({
-      where: { id: clientProfileId },
-      include: { user: true }
-    });
-
-    const newClientService = await prisma.clientService.create({
-      data: {
-        clientId: clientProfileId,
-        productId,
-        customName: customName || null,
-        price: priceFloat,
-        renewalPrice: renewalPriceFloat,
-        billingCycle,
-        startDate: new Date(startDate),
-        expiryDate: nextDueDateObj,
-        status: status || 'ACTIVE',
-        notes: notes || null,
-        autoRenewReminder: Boolean(autoRenewReminder),
+  export async function assignServiceToClient(clientProfileId, formData) {
+    try {
+      const { productId, customName, price, renewalPrice, billingCycle, startDate, expiryDate, notes, autoRenewReminder, applyOnlineCharge, status, autoInvoice } = formData;
+      const priceFloat = parseFloat(price);
+      const renewalPriceFloat = renewalPrice ? parseFloat(renewalPrice) : null;
+      const nextDueDateObj = expiryDate ? new Date(expiryDate) : null;
+  
+      const profile = await prisma.clientProfile.findUnique({
+        where: { id: clientProfileId },
+        include: { user: true }
+      });
+  
+      const newClientService = await prisma.clientService.create({
+        data: {
+          clientId: clientProfileId,
+          productId,
+          customName: customName || null,
+          price: priceFloat,
+          renewalPrice: renewalPriceFloat,
+          billingCycle,
+          startDate: new Date(startDate),
+          expiryDate: nextDueDateObj,
+          status: status || 'ACTIVE',
+          notes: notes || null,
+          autoRenewReminder: Boolean(autoRenewReminder),
+          applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
       },
       include: {
         product: true
@@ -175,13 +178,19 @@ export async function assignServiceToClient(clientProfileId, formData) {
         // Fetch tax settings
         const { data: taxSetting } = await getTaxSetting();
         const taxRate = taxSetting?.isEnabled ? taxSetting.percentage : 0;
+        
+        const gatewaySetting = await prisma.paymentGatewaySetting.findFirst({ where: { provider: 'CASHFREE' } });
+        const onlinePaymentChargeRate = (applyOnlineCharge !== false) ? (gatewaySetting?.onlinePaymentCharge || 2.0) : 0;
 
         const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
         const invoiceNumber = `INV-${new Date().getFullYear()}-${randomStr}`;
         
         const basePrice = priceFloat;
         const taxAmount = (basePrice * taxRate) / 100;
-        const total = basePrice + taxAmount;
+        
+        const subTotalWithTax = basePrice + taxAmount;
+        const onlinePaymentCharge = (subTotalWithTax * onlinePaymentChargeRate) / 100;
+        const total = subTotalWithTax + onlinePaymentCharge;
 
         const newInvoice = await prisma.invoice.create({
           data: {
@@ -193,6 +202,7 @@ export async function assignServiceToClient(clientProfileId, formData) {
             subtotal: basePrice,
             discount: 0,
             taxAmount,
+            onlinePaymentCharge,
             total,
             status: 'PENDING', // Pending by default
             items: {
@@ -319,7 +329,7 @@ export async function getClientServiceById(id) {
  */
 export async function updateClientService(id, formData) {
   try {
-    const { customName, price, renewalPrice, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, dnsNameservers, domainOwnership } = formData;
+    const { customName, price, renewalPrice, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, applyOnlineCharge, dnsNameservers, domainOwnership } = formData;
     
     const updateData = {
       customName,
@@ -331,6 +341,7 @@ export async function updateClientService(id, formData) {
       status,
       notes,
       autoRenewReminder: Boolean(autoRenewReminder),
+      applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
     };
 
     if (dnsNameservers !== undefined || domainOwnership !== undefined) {

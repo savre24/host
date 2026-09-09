@@ -1,6 +1,6 @@
 import { getClients } from '@/app/actions/client';
 import { getActiveProducts } from '@/app/actions/product';
-import { getTaxSetting } from '@/app/actions/settings';
+import { getTaxSetting, getPaymentGatewaySetting } from '@/app/actions/settings';
 import { getInvoiceById } from '@/app/actions/billing';
 import ComponentContainerCard from '@/components/ComponentContainerCard';
 import PageTitle from '@/components/PageTitle';
@@ -33,6 +33,10 @@ const EditInvoicePage = async ({ params }) => {
   const { data: taxSetting } = await getTaxSetting();
   const defaultTaxRate = taxSetting?.isEnabled ? taxSetting.percentage : 0;
 
+  // Fetch gateway settings
+  const { data: gatewaySetting } = await getPaymentGatewaySetting();
+  const onlineChargeRate = gatewaySetting?.onlinePaymentCharge || 2.0;
+
   return (
     <>
       <PageTitle title={`Edit Invoice ${invoice.invoiceNumber}`} subTitle="Billing" />
@@ -56,6 +60,7 @@ const EditInvoicePage = async ({ params }) => {
                   products={products || []} 
                   defaultInvoiceNumber={invoice.invoiceNumber} 
                   defaultTaxRate={defaultTaxRate}
+                  onlineChargeRate={onlineChargeRate}
                   initialData={invoice}
                 />
               </Col>

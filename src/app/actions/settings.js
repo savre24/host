@@ -107,7 +107,14 @@ export async function getPaymentGatewaySetting() {
     });
     if (!setting) {
       setting = await prisma.paymentGatewaySetting.create({
-        data: { provider: 'CASHFREE' }
+        data: { 
+          provider: 'CASHFREE',
+          appId: '',
+          secretKey: '',
+          environment: 'TEST',
+          isActive: false,
+          onlinePaymentCharge: 2.0
+        }
       });
     }
     const plainSetting = setting ? JSON.parse(JSON.stringify(setting)) : null;
@@ -120,7 +127,7 @@ export async function getPaymentGatewaySetting() {
 
 export async function updatePaymentGatewaySetting(data) {
   try {
-    const { appId, secretKey, environment, isActive } = data;
+    const { appId, secretKey, environment, isActive, onlinePaymentCharge } = data;
     let setting = await prisma.paymentGatewaySetting.findFirst({
       where: { provider: 'CASHFREE' }
     });
@@ -128,11 +135,24 @@ export async function updatePaymentGatewaySetting(data) {
     if (setting) {
       setting = await prisma.paymentGatewaySetting.update({
         where: { id: setting.id },
-        data: { appId, secretKey, environment, isActive }
+        data: { 
+          appId: appId ?? setting.appId, 
+          secretKey: secretKey ?? setting.secretKey, 
+          environment: environment ?? setting.environment, 
+          isActive: isActive === 'true' || isActive === true,
+          onlinePaymentCharge: onlinePaymentCharge ? parseFloat(onlinePaymentCharge) : setting.onlinePaymentCharge
+        }
       });
     } else {
       setting = await prisma.paymentGatewaySetting.create({
-        data: { provider: 'CASHFREE', appId, secretKey, environment, isActive }
+        data: { 
+          provider: 'CASHFREE', 
+          appId: appId || '', 
+          secretKey: secretKey || '', 
+          environment: environment || 'TEST', 
+          isActive: isActive === 'true' || isActive === true,
+          onlinePaymentCharge: onlinePaymentCharge ? parseFloat(onlinePaymentCharge) : 2.0
+        }
       });
     }
     

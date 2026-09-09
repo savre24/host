@@ -45,7 +45,7 @@ const CashfreePaymentButton = ({ invoice }) => {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to initialize payment');
+        throw new Error(data.details || data.error || 'Failed to initialize payment');
       }
 
       // 2. Open Cashfree Checkout Modal

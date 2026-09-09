@@ -32,6 +32,7 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
     // Parse booleans
     data.autoRenewReminder = data.autoRenewReminder === 'on';
     data.autoInvoice = data.autoInvoice === 'on';
+    data.applyOnlineCharge = data.applyOnlineCharge === 'on';
 
     startTransition(async () => {
       setError(null);
@@ -118,21 +119,28 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
       </Row>
 
       <Row className="mb-4">
-        <Form.Group as={Col} md="4">
+        <Form.Group as={Col} md="3">
           <Form.Label>Auto-Renew Reminders?</Form.Label>
           <div className="mt-2">
             <input type="checkbox" id="autoRenewReminder" name="autoRenewReminder" defaultChecked={selectedProduct?.isRenewable} data-switch="success" />
             <label htmlFor="autoRenewReminder" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
           </div>
         </Form.Group>
-        <Form.Group as={Col} md="4">
+        <Form.Group as={Col} md="3">
           <Form.Label>Auto-Generate Invoice?</Form.Label>
           <div className="mt-2">
             <input type="checkbox" id="autoInvoice" name="autoInvoice" defaultChecked={true} data-switch="primary" />
             <label htmlFor="autoInvoice" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
           </div>
         </Form.Group>
-        <Form.Group as={Col} md="4">
+        <Form.Group as={Col} md="3">
+          <Form.Label>Online Charge?</Form.Label>
+          <div className="mt-2">
+            <input type="checkbox" id="applyOnlineCharge" name="applyOnlineCharge" defaultChecked={selectedProduct?.applyOnlineCharge !== false} data-switch="success" />
+            <label htmlFor="applyOnlineCharge" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
+          </div>
+        </Form.Group>
+        <Form.Group as={Col} md="3">
           <Form.Label>Initial Status</Form.Label>
           <Form.Select name="status" defaultValue="ACTIVE">
             <option value="ACTIVE">Active</option>

@@ -18,6 +18,7 @@ const EditClientServiceForm = ({ service }) => {
     
     // Parse booleans
     data.autoRenewReminder = data.autoRenewReminder === 'on';
+    data.applyOnlineCharge = data.applyOnlineCharge === 'on';
 
     startTransition(async () => {
       setError(null);
@@ -86,14 +87,21 @@ const EditClientServiceForm = ({ service }) => {
       </Row>
 
       <Row className="mb-4">
-        <Form.Group as={Col} md="6">
+        <Form.Group as={Col} md="4">
           <Form.Label>Auto-Renew Reminders?</Form.Label>
           <div className="mt-2">
             <input type="checkbox" id="autoRenewReminder" name="autoRenewReminder" defaultChecked={service.autoRenewReminder} data-switch="success" />
             <label htmlFor="autoRenewReminder" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
           </div>
         </Form.Group>
-        <Form.Group as={Col} md="6">
+        <Form.Group as={Col} md="4">
+          <Form.Label>Online Charge?</Form.Label>
+          <div className="mt-2">
+            <input type="checkbox" id="applyOnlineCharge" name="applyOnlineCharge" defaultChecked={service.applyOnlineCharge !== false} data-switch="success" />
+            <label htmlFor="applyOnlineCharge" data-on-label="Yes" data-off-label="No" className="mb-0 d-block" />
+          </div>
+        </Form.Group>
+        <Form.Group as={Col} md="4">
           <Form.Label>Status</Form.Label>
           <Form.Select name="status" defaultValue={service.status}>
             <option value="ACTIVE">Active</option>
