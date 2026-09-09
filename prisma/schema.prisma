@@ -57,6 +57,7 @@ model ProductService {
   category     String?
   description  String?
   defaultPrice Float
+  renewalPrice Float?
   billingCycle BillingCycle @default(MONTHLY)
   isRenewable  Boolean  @default(true)
   isActive     Boolean  @default(true)
@@ -83,6 +84,7 @@ model ClientService {
   product           ProductService @relation(fields: [productId], references: [id])
   customName        String?
   price             Float
+  renewalPrice      Float?
   billingCycle      BillingCycle @default(MONTHLY)
   startDate         DateTime
   expiryDate        DateTime?

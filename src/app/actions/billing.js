@@ -279,8 +279,8 @@ export async function generateRenewalInvoice(clientServiceId) {
 
     if (!service) return { error: 'Service not found' };
 
-    // Create a Renewal record if we don't have one for this cycle (or just create a fresh one)
-    const renewalAmount = service.price || service.product.defaultPrice;
+    // Priority: Client-specific renewal price -> Product renewal price -> Client price -> Product default price
+    const renewalAmount = service.renewalPrice ?? service.product.renewalPrice ?? service.price ?? service.product.defaultPrice;
     
     // Check if an unpaid invoice already exists for this service's current expiry date?
     // We can just rely on the user not clicking it twice.

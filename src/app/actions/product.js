@@ -10,7 +10,7 @@ import { sendWhatsAppMessage, fillWhatsAppTemplate } from '@/app/actions/whatsap
  */
 export async function createProduct(formData) {
   try {
-    const { name, category, description, defaultPrice, billingCycle, isRenewable, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, isActive } = formData;
 
     const newProduct = await prisma.productService.create({
       data: {
@@ -18,6 +18,7 @@ export async function createProduct(formData) {
         category,
         description,
         defaultPrice: parseFloat(defaultPrice),
+        renewalPrice: renewalPrice ? parseFloat(renewalPrice) : null,
         billingCycle,
         isRenewable: Boolean(isRenewable),
         isActive: Boolean(isActive),
@@ -37,7 +38,7 @@ export async function createProduct(formData) {
  */
 export async function updateProduct(id, formData) {
   try {
-    const { name, category, description, defaultPrice, billingCycle, isRenewable, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, isActive } = formData;
 
     const updatedProduct = await prisma.productService.update({
       where: { id },
@@ -46,6 +47,7 @@ export async function updateProduct(id, formData) {
         category,
         description,
         defaultPrice: parseFloat(defaultPrice),
+        renewalPrice: renewalPrice ? parseFloat(renewalPrice) : null,
         billingCycle,
         isRenewable: Boolean(isRenewable),
         isActive: Boolean(isActive),
@@ -136,8 +138,9 @@ export async function getActiveProducts() {
  */
 export async function assignServiceToClient(clientProfileId, formData) {
   try {
-    const { productId, customName, price, billingCycle, startDate, expiryDate, notes, autoRenewReminder, status, autoInvoice } = formData;
+    const { productId, customName, price, renewalPrice, billingCycle, startDate, expiryDate, notes, autoRenewReminder, status, autoInvoice } = formData;
     const priceFloat = parseFloat(price);
+    const renewalPriceFloat = renewalPrice ? parseFloat(renewalPrice) : null;
     const nextDueDateObj = expiryDate ? new Date(expiryDate) : null;
 
     const profile = await prisma.clientProfile.findUnique({
@@ -151,6 +154,7 @@ export async function assignServiceToClient(clientProfileId, formData) {
         productId,
         customName: customName || null,
         price: priceFloat,
+        renewalPrice: renewalPriceFloat,
         billingCycle,
         startDate: new Date(startDate),
         expiryDate: nextDueDateObj,
@@ -315,11 +319,12 @@ export async function getClientServiceById(id) {
  */
 export async function updateClientService(id, formData) {
   try {
-    const { customName, price, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, dnsNameservers, domainOwnership } = formData;
+    const { customName, price, renewalPrice, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, dnsNameservers, domainOwnership } = formData;
     
     const updateData = {
       customName,
       price: parseFloat(price),
+      renewalPrice: renewalPrice ? parseFloat(renewalPrice) : null,
       billingCycle,
       startDate: new Date(startDate),
       expiryDate: expiryDate ? new Date(expiryDate) : null,

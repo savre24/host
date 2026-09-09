@@ -13,12 +13,14 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
   
   const [selectedProduct, setSelectedProduct] = useState(products[0] || null);
   const [price, setPrice] = useState(products[0]?.defaultPrice || 0);
+  const [renewalPrice, setRenewalPrice] = useState(products[0]?.renewalPrice || '');
 
   const handleProductChange = (e) => {
     const prod = products.find(p => p.id === e.target.value);
     setSelectedProduct(prod);
     if (prod) {
       setPrice(prod.defaultPrice);
+      setRenewalPrice(prod.renewalPrice || '');
     }
   };
 
@@ -76,11 +78,15 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
       </Row>
 
       <Row className="mb-3">
-        <Form.Group as={Col} md="6" controlId="price">
+        <Form.Group as={Col} md="4" controlId="price">
           <Form.Label>Assigned Price (₹)</Form.Label>
           <Form.Control required type="number" step="0.01" min="0" name="price" value={price} onChange={(e) => setPrice(e.target.value)} />
         </Form.Group>
-        <Form.Group as={Col} md="6" controlId="billingCycle">
+        <Form.Group as={Col} md="4" controlId="renewalPrice">
+          <Form.Label>Renewal Price (₹)</Form.Label>
+          <Form.Control type="number" step="0.01" min="0" name="renewalPrice" value={renewalPrice} onChange={(e) => setRenewalPrice(e.target.value)} placeholder="Same as assigned price" />
+        </Form.Group>
+        <Form.Group as={Col} md="4" controlId="billingCycle">
           <Form.Label>Billing Cycle</Form.Label>
           <Form.Select name="billingCycle" defaultValue={selectedProduct?.billingCycle || 'MONTHLY'}>
             <option value="ONE_TIME">One-time</option>

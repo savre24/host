@@ -63,11 +63,15 @@ const EditProductForm = ({ product }) => {
       </Row>
 
       <Row className="mb-3">
-        <Form.Group as={Col} md="6" controlId="defaultPrice">
+        <Form.Group as={Col} md="4" controlId="defaultPrice">
           <Form.Label>Default Price (₹)</Form.Label>
           <Form.Control required type="number" step="0.01" min="0" name="defaultPrice" defaultValue={product.defaultPrice} />
         </Form.Group>
-        <Form.Group as={Col} md="6" controlId="billingCycle">
+        <Form.Group as={Col} md="4" controlId="renewalPrice">
+          <Form.Label>Renewal Price (₹)</Form.Label>
+          <Form.Control type="number" step="0.01" min="0" name="renewalPrice" defaultValue={product.renewalPrice || ''} placeholder="Same as default" />
+        </Form.Group>
+        <Form.Group as={Col} md="4" controlId="billingCycle">
           <Form.Label>Billing Cycle</Form.Label>
           <Form.Select name="billingCycle" defaultValue={product.billingCycle}>
             <option value="ONE_TIME">One-time</option>

@@ -31,7 +31,8 @@ const ProductsList = async ({ searchParams }) => {
             <tr>
               <th>Name</th>
               <th>Category</th>
-              <th>Price</th>
+              <th>Initial Price</th>
+              <th>Renewal Price</th>
               <th>Billing Cycle</th>
               <th>Renewable</th>
               <th>Status</th>
@@ -44,6 +45,7 @@ const ProductsList = async ({ searchParams }) => {
                 <td><strong>{product.name}</strong></td>
                 <td><span className="badge bg-secondary-subtle text-secondary">{product.category}</span></td>
                 <td>₹{product.defaultPrice.toFixed(2)}</td>
+                <td>{product.renewalPrice ? `₹${product.renewalPrice.toFixed(2)}` : '-'}</td>
                 <td>{product.billingCycle}</td>
                 <td>{product.isRenewable ? 'Yes' : 'No'}</td>
                 <td>
