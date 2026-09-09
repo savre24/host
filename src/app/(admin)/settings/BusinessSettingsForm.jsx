@@ -69,7 +69,32 @@ const BusinessSettingsForm = ({ initialData }) => {
                     if (file) {
                       const reader = new FileReader();
                       reader.onloadend = () => {
-                        setFormData(prev => ({ ...prev, logoUrl: reader.result }));
+                        // Compress image
+                        const img = new Image();
+                        img.onload = () => {
+                          const canvas = document.createElement('canvas');
+                          let width = img.width;
+                          let height = img.height;
+                          const maxDim = 300;
+                          
+                          if (width > height && width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                          } else if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                          }
+                          
+                          canvas.width = width;
+                          canvas.height = height;
+                          const ctx = canvas.getContext('2d');
+                          ctx.drawImage(img, 0, 0, width, height);
+                          
+                          // Convert to compressed WebP (or JPEG) to drastically reduce size
+                          const compressedBase64 = canvas.toDataURL('image/webp', 0.8);
+                          setFormData(prev => ({ ...prev, logoUrl: compressedBase64 }));
+                        };
+                        img.src = reader.result;
                       };
                       reader.readAsDataURL(file);
                     }
@@ -102,7 +127,31 @@ const BusinessSettingsForm = ({ initialData }) => {
                     if (file) {
                       const reader = new FileReader();
                       reader.onloadend = () => {
-                        setFormData(prev => ({ ...prev, iconUrl: reader.result }));
+                        // Compress icon
+                        const img = new Image();
+                        img.onload = () => {
+                          const canvas = document.createElement('canvas');
+                          let width = img.width;
+                          let height = img.height;
+                          const maxDim = 150; // Icon can be smaller
+                          
+                          if (width > height && width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                          } else if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                          }
+                          
+                          canvas.width = width;
+                          canvas.height = height;
+                          const ctx = canvas.getContext('2d');
+                          ctx.drawImage(img, 0, 0, width, height);
+                          
+                          const compressedBase64 = canvas.toDataURL('image/webp', 0.8);
+                          setFormData(prev => ({ ...prev, iconUrl: compressedBase64 }));
+                        };
+                        img.src = reader.result;
                       };
                       reader.readAsDataURL(file);
                     }
