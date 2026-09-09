@@ -70,7 +70,8 @@ export async function POST(req) {
     };
 
     // 5. Create Order using Cashfree SDK
-    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+    const cashfreeInstance = new Cashfree();
+    const response = await cashfreeInstance.PGCreateOrder("2023-08-01", request);
     
     if (response && response.data) {
       return NextResponse.json({
