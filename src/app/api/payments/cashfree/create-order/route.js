@@ -59,7 +59,7 @@ export async function POST(req) {
         customer_id: invoice.clientId.substring(0, 10),
         customer_name: invoice.client.user?.name || invoice.client.companyName || 'Client',
         customer_email: invoice.client.user?.email || 'no-email@example.com',
-        customer_phone: invoice.client.phone || '9999999999',
+        customer_phone: invoice.client.phone ? (invoice.client.phone.replace(/\D/g, '').length >= 10 ? invoice.client.phone.replace(/\D/g, '').slice(-10) : '9999999999') : '9999999999',
       },
       order_meta: {
         return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/client/payments/verify?order_id={order_id}&invoice_id=${invoice.id}`,

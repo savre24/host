@@ -60,6 +60,12 @@ export const MENU_ITEMS = [
     url: '/payments',
   },
   {
+    key: 'reports',
+    label: 'Reports',
+    icon: 'tabler:report',
+    url: '/reports',
+  },
+  {
     key: 'support',
     label: 'Support Tickets',
     icon: 'tabler:headset',
