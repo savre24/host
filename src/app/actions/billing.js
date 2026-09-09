@@ -131,6 +131,68 @@ export async function createInvoice(formData, items) {
 }
 
 /**
+ * Update an existing Invoice with Items
+ */
+export async function updateInvoice(invoiceId, formData, items) {
+  try {
+    const { clientId, invoiceNumber, invoiceDate, dueDate, notes, subtotal, discount, taxAmount, total, status } = formData;
+    
+    // Check if invoice number is taken by another invoice
+    const existing = await prisma.invoice.findFirst({ 
+      where: { 
+        invoiceNumber,
+        NOT: { id: invoiceId }
+      } 
+    });
+    
+    if (existing) {
+      return { error: 'Another invoice with this number already exists.' };
+    }
+
+    // Delete existing items first
+    await prisma.invoiceItem.deleteMany({
+      where: { invoiceId }
+    });
+
+    const updatedInvoice = await prisma.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        clientId,
+        invoiceNumber,
+        invoiceDate: new Date(invoiceDate),
+        dueDate: new Date(dueDate),
+        notes,
+        subtotal: parseFloat(subtotal),
+        discount: parseFloat(discount),
+        taxAmount: parseFloat(taxAmount),
+        total: parseFloat(total),
+        status: status,
+        items: {
+          create: items.map(item => ({
+            description: item.description,
+            quantity: parseInt(item.quantity, 10),
+            unitPrice: parseFloat(item.unitPrice),
+            discount: parseFloat(item.discount || 0),
+            taxRate: parseFloat(item.taxRate || 0),
+            total: parseFloat(item.total)
+          }))
+        }
+      },
+      include: {
+        client: { include: { user: true } }
+      }
+    });
+
+    revalidatePath('/invoices');
+    revalidatePath(`/invoices/${invoiceId}`);
+    return { success: true, data: updatedInvoice };
+  } catch (error) {
+    console.error('Error updating invoice:', error);
+    return { error: 'Failed to update invoice' };
+  }
+}
+
+/**
  * Update Invoice Status
  */
 export async function updateInvoiceStatus(id, status) {

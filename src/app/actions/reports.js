@@ -10,7 +10,7 @@ export async function getReceivedPaymentsReport(startDate, endDate) {
           gte: new Date(startDate),
           lte: new Date(endDate),
         },
-        status: 'SUCCESS'
+        status: 'COMPLETED'
       },
       include: {
         invoice: {

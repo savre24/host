@@ -153,7 +153,7 @@ export default function ReportsClient() {
                       {reportType === 'received' && (
                         <>
                           <td>{new Date(row.paymentDate).toLocaleDateString()}</td>
-                          <td><span className="fw-medium text-body">{row.transactionId}</span></td>
+                          <td><span className="fw-medium text-body">{row.paymentReference || '-'}</span></td>
                           <td>
                             <Link href={`/clients/${row.invoice?.client?.user?.id}`} className="text-primary">
                               {row.invoice?.client?.user?.name || row.invoice?.client?.companyName}
@@ -164,7 +164,7 @@ export default function ReportsClient() {
                               {row.invoice?.invoiceNumber}
                             </Link>
                           </td>
-                          <td>{row.paymentMethod.replace('_', ' ')}</td>
+                          <td>{row.paymentMethod ? row.paymentMethod.replace('_', ' ') : 'N/A'}</td>
                           <td className="text-end fw-bold text-success">₹{row.amount.toFixed(2)}</td>
                         </>
                       )}

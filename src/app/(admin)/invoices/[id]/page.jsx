@@ -215,6 +215,9 @@ const ViewInvoicePage = async ({ params }) => {
                 )}
               </div>
               <div className="d-flex gap-2">
+                <Link href={`/invoices/${invoice.id}/edit`} className="btn btn-warning text-white">
+                  <IconifyIcon icon="tabler:pencil" className="me-1" /> Edit
+                </Link>
                 <PrintButton />
                 <Button variant="info"><IconifyIcon icon='tabler:send' className="me-1" /> Send to Client</Button>
               </div>

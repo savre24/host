@@ -45,18 +45,18 @@ export async function POST(req) {
     Cashfree.XEnvironment = gatewaySetting.environment === 'PRODUCTION' ? CFEnvironment.PRODUCTION : CFEnvironment.SANDBOX;
 
     // 4. Create Order Payload
-    const orderId = `order_${invoice.id.substring(0, 8)}_${Date.now()}`;
+    const orderId = `order_${invoice.id.replace(/-/g, '').substring(0, 8)}_${Date.now()}`;
     const orderAmount = invoice.total;
     
-    // Ensure amount is formatted to 2 decimal places
-    const formattedAmount = Number(orderAmount).toFixed(2);
+    // Ensure amount is formatted as a Number for the SDK (e.g., 1780.00 -> 1780)
+    const formattedAmount = parseFloat(Number(orderAmount).toFixed(2));
 
     const request = {
       order_amount: formattedAmount,
       order_currency: 'INR',
       order_id: orderId,
       customer_details: {
-        customer_id: invoice.clientId.substring(0, 10),
+        customer_id: invoice.clientId.replace(/-/g, '').substring(0, 20),
         customer_name: invoice.client.user?.name || invoice.client.companyName || 'Client',
         customer_email: invoice.client.user?.email || 'no-email@example.com',
         customer_phone: invoice.client.phone ? (invoice.client.phone.replace(/\D/g, '').length >= 10 ? invoice.client.phone.replace(/\D/g, '').slice(-10) : '9999999999') : '9999999999',
@@ -83,7 +83,13 @@ export async function POST(req) {
     }
 
   } catch (error) {
-    console.error('Cashfree Order Creation Error:', error?.response?.data || error);
-    return NextResponse.json({ error: 'Failed to initiate payment process' }, { status: 500 });
+    const errorDetails = error?.response?.data || error?.message || error;
+    console.error('Cashfree Order Creation Error:', errorDetails);
+    
+    // Return detailed error for easier debugging
+    return NextResponse.json({ 
+      error: 'Failed to initiate payment process', 
+      details: error?.response?.data?.message || error?.message || String(error)
+    }, { status: 500 });
   }
 }

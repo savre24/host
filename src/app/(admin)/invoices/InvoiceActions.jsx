@@ -52,6 +52,10 @@ const InvoiceActions = ({ invoiceId, status }) => {
             <Dropdown.Item onClick={() => handleStatusChange('CANCELLED')} disabled={status === 'CANCELLED'} className="text-danger">Mark as Cancelled</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+        
+        <Link href={`/invoices/${invoiceId}/edit`} className="text-warning fs-16 d-flex align-items-center" title="Edit">
+          <IconifyIcon icon="tabler:pencil" width={18} height={18} />
+        </Link>
 
         <button 
           onClick={handleDelete} 
