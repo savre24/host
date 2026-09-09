@@ -48,6 +48,14 @@ export async function POST(req) {
     // Ensure amount is formatted as a Number for the SDK (e.g., 1780.00 -> 1780)
     const formattedAmount = parseFloat(Number(orderAmount).toFixed(2));
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'https://localhost:3000';
+    // Cashfree strictly requires HTTPS for return_url
+    const secureBaseUrl = baseUrl.startsWith('http://') && !baseUrl.includes('localhost') 
+      ? baseUrl.replace('http://', 'https://') 
+      : baseUrl.includes('localhost') 
+        ? baseUrl.replace('http://', 'https://') // Force https for localhost as well to pass validation
+        : baseUrl;
+
     const request = {
       order_amount: formattedAmount,
       order_currency: 'INR',
@@ -59,7 +67,7 @@ export async function POST(req) {
         customer_phone: invoice.client.phone ? (invoice.client.phone.replace(/\D/g, '').length >= 10 ? invoice.client.phone.replace(/\D/g, '').slice(-10) : '9999999999') : '9999999999',
       },
       order_meta: {
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/client/payments/verify?order_id={order_id}&invoice_id=${invoice.id}`,
+        return_url: `${secureBaseUrl}/client/payments/verify?order_id={order_id}&invoice_id=${invoice.id}`,
       },
       order_tags: {
         invoice_id: invoice.id
