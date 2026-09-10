@@ -7,6 +7,7 @@ import signature from '@/assets/images/png/signature.png';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import PageTitle from '@/components/PageTitle';
 import PrintButton from '@/app/(admin)/invoices/view-invoice/PrintButton';
+import DownloadPdfButton from './DownloadPdfButton';
 import { Button, Card, CardBody, Col, Row, Badge } from 'react-bootstrap';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -15,8 +16,10 @@ export const metadata = {
   title: 'View Invoice'
 };
 
-const ViewClientInvoicePage = async ({ params }) => {
-  const { id } = params;
+const ViewClientInvoicePage = async (props) => {
+  const { id } = await props.params;
+  const searchParams = await props.searchParams;
+  const autoDownload = searchParams?.download === 'true';
   const { data: invoice, error } = await getInvoiceById(id);
 
   if (error || !invoice) {
@@ -45,17 +48,26 @@ const ViewClientInvoicePage = async ({ params }) => {
 
       <Row>
         <Col xs={12}>
-          <Card>
+          <Card id="invoice-pdf-content" className="position-relative overflow-hidden">
             <CardBody>
               <div className="d-flex align-items-start justify-content-between mb-4">
-                <div>
+                <div className="position-relative z-1">
                   {businessSetting?.logoUrl ? (
                     <img src={businessSetting.logoUrl} alt="Logo" style={{ height: 'auto', maxHeight: '60px', maxWidth: '250px', objectFit: 'contain' }} />
                   ) : (
                     <h3 className="m-0 fw-bolder fs-24">{businessSetting?.companyName || 'Company Name'}</h3>
                   )}
                 </div>
-                <div className="text-end">
+                
+                {/* Large watermark for printing / PDF */}
+                <div 
+                  className={`position-absolute top-0 end-0 mt-5 me-5 z-0 opacity-25 fw-bolder ${invoice.status === 'PAID' ? 'text-success' : 'text-danger'}`}
+                  style={{ fontSize: '100px', transform: 'rotate(-15deg)', pointerEvents: 'none' }}
+                >
+                  {invoice.status === 'PAID' ? 'PAID' : (invoice.status === 'UNPAID' || invoice.status === 'OVERDUE' ? 'UNPAID' : '')}
+                </div>
+
+                <div className="text-end position-relative z-1">
                   {invoice.status === 'PAID' && <span className="badge bg-success-subtle text-success px-2 py-1 fs-12 mb-3">Paid</span>}
                   {invoice.status === 'UNPAID' && <span className="badge bg-warning-subtle text-warning px-2 py-1 fs-12 mb-3">Unpaid</span>}
                   {invoice.status === 'DRAFT' && <span className="badge bg-info-subtle text-info px-2 py-1 fs-12 mb-3">Draft</span>}
@@ -229,6 +241,7 @@ const ViewClientInvoicePage = async ({ params }) => {
           
           <div className="d-print-none mb-5 mt-4">
             <div className="d-flex justify-content-end gap-2">
+              <DownloadPdfButton targetId="invoice-pdf-content" filename={`Invoice_${invoice.invoiceNumber}.pdf`} autoDownload={autoDownload} />
               <PrintButton />
               {invoice.status !== 'PAID' && (
                 <Button as={Link} href={`/client/payments/pay/${invoice.id}`} variant="primary"><IconifyIcon icon='tabler:credit-card' className="me-1" /> Pay Now (Cashfree)</Button>

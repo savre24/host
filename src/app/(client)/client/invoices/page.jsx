@@ -65,6 +65,9 @@ const ClientInvoicesList = async () => {
                    <Link href={`/client/invoices/${inv.id}`} className="btn btn-sm btn-outline-info me-2">
                      View
                    </Link>
+                   <Link href={`/client/invoices/${inv.id}?download=true`} className="btn btn-sm btn-outline-secondary me-2" title="Download PDF">
+                     <IconifyIcon icon="tabler:download" />
+                   </Link>
                    {inv.status !== 'PAID' && inv.status !== 'CANCELLED' && (
                      <Link href={`/client/payments/pay/${inv.id}`} className="btn btn-sm btn-primary">
                        Pay Now
