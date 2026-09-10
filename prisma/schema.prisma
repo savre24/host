@@ -171,7 +171,7 @@ model QuotationItem {
   quotationId String
   quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
   productId   String?
-  product     Product?  @relation(fields: [productId], references: [id])
+  product     ProductService?  @relation(fields: [productId], references: [id])
   description String
   quantity    Int
   unitPrice   Float
@@ -217,7 +217,7 @@ model InvoiceItem {
   invoiceId   String
   invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   productId   String?
-  product     Product?  @relation(fields: [productId], references: [id])
+  product     ProductService?  @relation(fields: [productId], references: [id])
   description String
   quantity    Int
   unitPrice   Float
