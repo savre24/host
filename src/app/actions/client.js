@@ -136,7 +136,11 @@ export async function getClientById(userId) {
               },
             },
             quotations: true,
-            invoices: true,
+            invoices: {
+              include: {
+                items: true
+              }
+            },
             payments: true,
           },
         },

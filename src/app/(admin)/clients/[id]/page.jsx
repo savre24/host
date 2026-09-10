@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Col, Row, Table } from 'react-bootstrap';
 import ClientServiceActions from './ClientServiceActions';
+import CopyWhatsAppButton from './CopyWhatsAppButton';
 
 export const metadata = {
   title: 'Client Details',
@@ -54,6 +55,14 @@ const ClientViewPage = async ({ params }) => {
                 <p className="mb-2"><strong>Address:</strong> {profile.address || 'N/A'}</p>
                 <p className="mb-2"><strong>Status:</strong> {profile.loginStatus ? <span className="badge bg-success">Active</span> : <span className="badge bg-danger">Disabled</span>}</p>
                 <p className="mb-2"><strong>Joined:</strong> {new Date(client.createdAt).toLocaleDateString()}</p>
+              </div>
+
+              <div className="mt-4 text-start">
+                <h6 className="text-uppercase text-muted mb-3">Billing Overview</h6>
+                <div className="p-3 bg-light rounded d-flex justify-content-between align-items-center">
+                  <span className="fw-medium text-muted">Total Pending</span>
+                  <h4 className="mb-0 text-danger">₹{profile.invoices ? profile.invoices.filter(i => i.status === 'PENDING' || i.status === 'PARTIALLY_PAID').reduce((sum, inv) => sum + inv.total, 0).toFixed(2) : '0.00'}</h4>
+                </div>
               </div>
 
               {profile.notes && (
@@ -117,9 +126,12 @@ const ClientViewPage = async ({ params }) => {
             title="Recent Invoices" 
             className="mb-4"
             action={
-              <Link href="/invoices/create" className="btn btn-sm btn-outline-primary">
-                <IconifyIcon icon="tabler:plus" className="me-1" /> New Invoice
-              </Link>
+              <div className="d-flex align-items-center">
+                <CopyWhatsAppButton client={client} invoices={profile.invoices} />
+                <Link href="/invoices/create" className="btn btn-sm btn-outline-primary">
+                  <IconifyIcon icon="tabler:plus" className="me-1" /> New Invoice
+                </Link>
+              </div>
             }
           >
             {profile.invoices && profile.invoices.length > 0 ? (
