@@ -71,13 +71,9 @@ const ClientServicesList = async () => {
                 {categoryServices.map((service) => (
                   <tr key={service.id}>
                     <td className="fw-medium text-primary">
-                      {category.toUpperCase() === 'DOMAIN' ? (
-                        <Link href={`/client/services/${service.id}`} className="text-primary text-decoration-underline">
-                          {service.customName || 'N/A'}
-                        </Link>
-                      ) : (
-                        service.customName || 'N/A'
-                      )}
+                      <Link href={`/client/services/${service.id}`} className="text-primary text-decoration-underline">
+                        {service.customName || 'View Details'}
+                      </Link>
                     </td>
                     <td>
                       <span className="fw-medium">{service.product.name}</span>

@@ -149,7 +149,7 @@ const EditClientServiceForm = ({ service }) => {
             </Form.Group>
             <Form.Group as={Col} md="6" controlId="radioServerDetails">
               <Form.Label>Radio Server Details</Form.Label>
-              <Form.Control as="textarea" rows={2} name="radioServerDetails" defaultValue={service.radioServerDetail?.serverDetails || ''} placeholder="Stream URL, IP, Port, etc." />
+              <Form.Control as="textarea" rows={6} name="radioServerDetails" defaultValue={service.radioServerDetail?.serverDetails || ''} placeholder="Stream URL, IP, Port, etc." />
             </Form.Group>
           </Row>
         </div>
