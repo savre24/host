@@ -116,10 +116,12 @@ const ViewInvoicePage = async ({ params }) => {
                               )}
                               
                               <span className="fw-medium d-block">
-                                {item.product ? item.product.name : item.description}
+                                {item.product 
+                                  ? item.product.name 
+                                  : (invoice.renewal?.clientService?.product?.name || item.description)}
                               </span>
                               
-                              {item.product && item.description !== item.product.name && (
+                              {(item.product || invoice.renewal?.clientService?.product) && item.description !== (item.product?.name || invoice.renewal?.clientService?.product?.name) && (
                                 <span className="text-muted fs-13 d-block mt-1">{item.description}</span>
                               )}
                               
