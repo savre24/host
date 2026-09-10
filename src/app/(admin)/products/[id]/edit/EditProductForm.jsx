@@ -49,6 +49,7 @@ const EditProductForm = ({ product }) => {
             <option value="GENERAL">General</option>
             <option value="DOMAIN">Domain</option>
             <option value="HOSTING">Hosting</option>
+            <option value="RADIO_SERVER">Radio Server</option>
             <option value="DESIGN">Design</option>
             <option value="MARKETING">Marketing</option>
             <option value="RETAINER">Retainer</option>
