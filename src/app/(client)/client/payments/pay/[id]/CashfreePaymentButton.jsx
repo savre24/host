@@ -6,7 +6,7 @@ import { load } from '@cashfreepayments/cashfree-js';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
-const CashfreePaymentButton = ({ invoice }) => {
+const CashfreePaymentButton = ({ invoice, balanceDue }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cashfree, setCashfree] = useState(null);
   const router = useRouter();
@@ -72,9 +72,9 @@ const CashfreePaymentButton = ({ invoice }) => {
 
       const data = await response.json();
 
-      if (data.success && data.status === 'PAID') {
-        toast.success('Payment successful! Your invoice has been marked as paid.');
-        router.refresh(); // Refresh the page to show the "PAID" state
+      if (data.success && (data.status === 'PAID' || data.status === 'PARTIALLY_PAID')) {
+        toast.success('Payment successful! Your invoice balance has been updated.');
+        router.refresh(); // Refresh the page to show the new state
       } else {
         toast.error(`Payment not verified: ${data.message || 'Unknown status'}`);
         setIsProcessing(false);
@@ -85,6 +85,8 @@ const CashfreePaymentButton = ({ invoice }) => {
       setIsProcessing(false);
     }
   };
+
+  const amountToPay = balanceDue !== undefined ? balanceDue : invoice.total;
 
   return (
     <Button 
@@ -102,7 +104,7 @@ const CashfreePaymentButton = ({ invoice }) => {
       ) : (
         <>
           <i className="ti ti-lock me-2"></i>
-          Pay ₹{invoice.total.toFixed(2)} Securely
+          Pay ₹{amountToPay.toFixed(2)} Securely
         </>
       )}
     </Button>

@@ -7,7 +7,7 @@ import signature from '@/assets/images/png/signature.png';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import PageTitle from '@/components/PageTitle';
 import PrintButton from '@/app/(admin)/invoices/view-invoice/PrintButton';
-import DownloadPdfButton from './DownloadPdfButton';
+import DownloadPdfButton from '@/components/DownloadPdfButton';
 import { Button, Card, CardBody, Col, Row, Badge } from 'react-bootstrap';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';

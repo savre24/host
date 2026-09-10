@@ -16,7 +16,8 @@ export async function POST(req) {
       include: {
         client: {
           include: { user: true }
-        }
+        },
+        payments: true
       }
     });
 
@@ -43,8 +44,15 @@ export async function POST(req) {
     cashfree.XApiVersion = "2023-08-01"; // Explicitly set for compatibility with cashfree-js
 
     // 4. Create Order Payload
+    const totalPaid = invoice.payments ? invoice.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
+    const balanceDue = invoice.total - totalPaid;
+    
+    if (balanceDue <= 0) {
+      return NextResponse.json({ error: 'Invoice is already fully paid' }, { status: 400 });
+    }
+
     const orderId = `order_${invoice.id.replace(/-/g, '').substring(0, 8)}_${Date.now()}`;
-    const orderAmount = invoice.total;
+    const orderAmount = balanceDue;
     
     // Ensure amount is formatted as a Number for the SDK (e.g., 1780.00 -> 1780)
     const formattedAmount = parseFloat(Number(orderAmount).toFixed(2));

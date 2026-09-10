@@ -41,6 +41,10 @@ const InvoiceActions = ({ invoiceId, status }) => {
           <IconifyIcon icon="tabler:eye" width={18} height={18} />
         </Link>
         
+        <Link href={`/invoices/${invoiceId}?download=true`} className="text-reset fs-16 d-flex align-items-center" title="Download PDF">
+          <IconifyIcon icon="tabler:download" width={18} height={18} />
+        </Link>
+        
         <Dropdown>
           <Dropdown.Toggle variant="link" className="text-reset fs-16 p-0 border-0 d-flex align-items-center arrow-none" title="Change Status" disabled={isPending}>
             <IconifyIcon icon="tabler:settings" width={18} height={18} />

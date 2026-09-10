@@ -65,13 +65,24 @@ const PaymentCheckoutPage = async ({ params }) => {
                       </div>
                     )}
                     <hr />
+                    <div className="d-flex justify-content-between mb-2">
+                      <span>Total Amount</span>
+                      <span>₹{invoice.total.toFixed(2)}</span>
+                    </div>
+                    {invoice.payments && invoice.payments.length > 0 && (
+                      <div className="d-flex justify-content-between mb-2 text-success">
+                        <span>Total Paid</span>
+                        <span>-₹{invoice.payments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}</span>
+                      </div>
+                    )}
+                    <hr />
                     <div className="d-flex justify-content-between align-items-center">
-                      <h5 className="mb-0">Total Due</h5>
-                      <h4 className="mb-0 text-primary">₹{invoice.total.toFixed(2)}</h4>
+                      <h5 className="mb-0">Balance Due</h5>
+                      <h4 className="mb-0 text-primary">₹{(invoice.total - (invoice.payments ? invoice.payments.reduce((sum, p) => sum + p.amount, 0) : 0)).toFixed(2)}</h4>
                     </div>
                   </div>
 
-                  <CashfreePaymentButton invoice={invoice} />
+                  <CashfreePaymentButton invoice={invoice} balanceDue={invoice.total - (invoice.payments ? invoice.payments.reduce((sum, p) => sum + p.amount, 0) : 0)} />
                 </>
               )}
             </div>
