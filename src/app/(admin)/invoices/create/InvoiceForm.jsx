@@ -13,7 +13,7 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
   const [error, setError] = useState(null);
 
   // Default Line Item
-  const emptyItem = { description: '', quantity: 1, unitPrice: 0, discount: 0, taxRate: defaultTaxRate, total: 0 };
+  const emptyItem = { productId: '', description: '', quantity: 1, unitPrice: 0, discount: 0, taxRate: defaultTaxRate, total: 0 };
   
   const [items, setItems] = useState(initialData?.items && initialData.items.length > 0 ? initialData.items : [{ ...emptyItem }]);
   
@@ -84,10 +84,12 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
     if (productId) {
       const selectedProduct = products.find(p => p.id === productId);
       if (selectedProduct) {
+        newItems[index].productId = productId;
         newItems[index].description = selectedProduct.name;
         newItems[index].unitPrice = selectedProduct.basePrice;
       }
     } else {
+      newItems[index].productId = '';
       newItems[index].description = '';
       newItems[index].unitPrice = 0;
     }
@@ -116,7 +118,11 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
       const rowTax = (rowTotalAfterDiscount * tRate) / 100;
       const finalRowTotal = rowTotalAfterDiscount + rowTax;
       
-      return { ...item, total: finalRowTotal };
+      return { 
+        ...item, 
+        total: finalRowTotal,
+        productId: item.productId || undefined 
+      };
     });
     
     if (validItems.length === 0) {
@@ -202,6 +208,7 @@ const InvoiceForm = ({ clients, products, defaultInvoiceNumber, defaultTaxRate =
                       <div className="d-flex flex-column gap-1">
                         <select 
                           className="form-select form-select-sm" 
+                          value={item.productId || ''}
                           onChange={(e) => handleProductSelect(index, e.target.value)}
                           data-choices="false"
                         >

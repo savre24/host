@@ -48,7 +48,9 @@ export async function getInvoiceById(id) {
         client: {
           include: { user: true }
         },
-        items: true,
+        items: {
+          include: { product: true }
+        },
         payments: true,
         renewal: {
           include: {
@@ -95,6 +97,7 @@ export async function createInvoice(formData, items) {
         status: status || 'DRAFT',
         items: {
           create: items.map(item => ({
+            productId: item.productId,
             description: item.description,
             quantity: parseInt(item.quantity, 10),
             unitPrice: parseFloat(item.unitPrice),
@@ -171,6 +174,7 @@ export async function updateInvoice(invoiceId, formData, items) {
         status: status,
         items: {
           create: items.map(item => ({
+            productId: item.productId,
             description: item.description,
             quantity: parseInt(item.quantity, 10),
             unitPrice: parseFloat(item.unitPrice),

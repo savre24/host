@@ -7,7 +7,7 @@ import PageTitle from '@/components/PageTitle';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Col, Row } from 'react-bootstrap';
-import InvoiceForm from '../../create/InvoiceForm';
+import InvoiceForm from '@/app/(admin)/invoices/create/InvoiceForm';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 export const metadata = {

@@ -170,6 +170,8 @@ model QuotationItem {
   id          String   @id @default(uuid())
   quotationId String
   quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?  @relation(fields: [productId], references: [id])
   description String
   quantity    Int
   unitPrice   Float
@@ -214,6 +216,8 @@ model InvoiceItem {
   id          String   @id @default(uuid())
   invoiceId   String
   invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?  @relation(fields: [productId], references: [id])
   description String
   quantity    Int
   unitPrice   Float

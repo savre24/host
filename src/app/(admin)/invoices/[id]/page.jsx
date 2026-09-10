@@ -108,10 +108,21 @@ const ViewInvoicePage = async ({ params }) => {
                         <td className="text-start">
                           <div className="d-flex align-items-center gap-2">
                             <div>
-                              <span className="fw-medium">{item.description}</span>
-                              {invoice.renewal?.clientService?.product?.category && (
-                                <p className="text-muted mb-0 fs-12 mt-1">Category: {invoice.renewal.clientService.product.category}</p>
+                              {item.product && (
+                                <Badge bg="secondary" className="mb-1 me-2">{item.product.category}</Badge>
                               )}
+                              {(!item.product && invoice.renewal?.clientService?.product?.category) && (
+                                <Badge bg="secondary" className="mb-1 me-2">{invoice.renewal.clientService.product.category}</Badge>
+                              )}
+                              
+                              <span className="fw-medium d-block">
+                                {item.product ? item.product.name : item.description}
+                              </span>
+                              
+                              {item.product && item.description !== item.product.name && (
+                                <span className="text-muted fs-13 d-block mt-1">{item.description}</span>
+                              )}
+                              
                               {item.discount > 0 && <p className="text-muted mb-0 fs-12">(Discount applied: ₹{item.discount.toFixed(2)})</p>}
                               {item.taxRate > 0 && <p className="text-muted mb-0 fs-12">(Tax applied: {item.taxRate}%)</p>}
                             </div>
