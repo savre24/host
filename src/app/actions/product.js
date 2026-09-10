@@ -72,8 +72,8 @@ export async function getProducts(searchQuery = '') {
     const whereClause = {};
     if (searchQuery) {
       whereClause.OR = [
-        { name: { contains: searchQuery, mode: 'insensitive' } },
-        { category: { contains: searchQuery, mode: 'insensitive' } },
+        { name: { contains: searchQuery } },
+        { category: { contains: searchQuery } },
       ];
     }
     const products = await prisma.productService.findMany({
@@ -275,10 +275,10 @@ export async function getAllClientServices(searchQuery = '') {
     const whereClause = {};
     if (searchQuery) {
       whereClause.OR = [
-        { customName: { contains: searchQuery, mode: 'insensitive' } },
-        { client: { companyName: { contains: searchQuery, mode: 'insensitive' } } },
-        { client: { user: { name: { contains: searchQuery, mode: 'insensitive' } } } },
-        { product: { name: { contains: searchQuery, mode: 'insensitive' } } },
+        { customName: { contains: searchQuery } },
+        { client: { companyName: { contains: searchQuery } } },
+        { client: { user: { name: { contains: searchQuery } } } },
+        { product: { name: { contains: searchQuery } } },
       ];
     }
     

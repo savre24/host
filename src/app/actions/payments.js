@@ -10,9 +10,9 @@ export async function getPayments(searchQuery = '') {
     const whereClause = {};
     if (searchQuery) {
       whereClause.OR = [
-        { paymentReference: { contains: searchQuery, mode: 'insensitive' } },
-        { client: { user: { name: { contains: searchQuery, mode: 'insensitive' } } } },
-        { invoice: { invoiceNumber: { contains: searchQuery, mode: 'insensitive' } } },
+        { paymentReference: { contains: searchQuery } },
+        { client: { user: { name: { contains: searchQuery } } } },
+        { invoice: { invoiceNumber: { contains: searchQuery } } },
       ];
     }
 

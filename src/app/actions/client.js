@@ -100,9 +100,9 @@ export async function getClients(searchQuery = '') {
     const whereClause = { role: 'CLIENT' };
     if (searchQuery) {
       whereClause.OR = [
-        { name: { contains: searchQuery, mode: 'insensitive' } },
-        { email: { contains: searchQuery, mode: 'insensitive' } },
-        { clientProfile: { companyName: { contains: searchQuery, mode: 'insensitive' } } },
+        { name: { contains: searchQuery } },
+        { email: { contains: searchQuery } },
+        { clientProfile: { companyName: { contains: searchQuery } } },
       ];
     }
 

@@ -15,8 +15,8 @@ export async function getTickets(searchQuery = '', statusFilter = '') {
     
     if (searchQuery) {
       whereClause.OR = [
-        { subject: { contains: searchQuery, mode: 'insensitive' } },
-        { client: { name: { contains: searchQuery, mode: 'insensitive' } } },
+        { subject: { contains: searchQuery } },
+        { client: { name: { contains: searchQuery } } },
       ];
     }
     

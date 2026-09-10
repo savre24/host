@@ -14,9 +14,9 @@ export async function getInvoices(searchQuery = '') {
     const whereClause = {};
     if (searchQuery) {
       whereClause.OR = [
-        { invoiceNumber: { contains: searchQuery, mode: 'insensitive' } },
-        { client: { companyName: { contains: searchQuery, mode: 'insensitive' } } },
-        { client: { user: { name: { contains: searchQuery, mode: 'insensitive' } } } },
+        { invoiceNumber: { contains: searchQuery } },
+        { client: { companyName: { contains: searchQuery } } },
+        { client: { user: { name: { contains: searchQuery } } } },
       ];
     }
     
@@ -448,9 +448,9 @@ export async function getQuotations(searchQuery = '') {
     const whereClause = {};
     if (searchQuery) {
       whereClause.OR = [
-        { quoteNumber: { contains: searchQuery, mode: 'insensitive' } },
-        { client: { companyName: { contains: searchQuery, mode: 'insensitive' } } },
-        { client: { user: { name: { contains: searchQuery, mode: 'insensitive' } } } },
+        { quoteNumber: { contains: searchQuery } },
+        { client: { companyName: { contains: searchQuery } } },
+        { client: { user: { name: { contains: searchQuery } } } },
       ];
     }
     

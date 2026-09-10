@@ -14,12 +14,12 @@ const LogoBox = () => {
   useEffect(() => {
     const fetchLogo = async () => {
       try {
-        const { data } = await getBusinessSetting();
-        if (data?.logoUrl) {
-          setCustomLogo(data.logoUrl);
+        const res = await getBusinessSetting();
+        if (res?.data?.logoUrl) {
+          setCustomLogo(res.data.logoUrl);
         }
-        if (data?.iconUrl) {
-          setCustomIcon(data.iconUrl);
+        if (res?.data?.iconUrl) {
+          setCustomIcon(res.data.iconUrl);
         }
       } catch (error) {
         console.error('Failed to load logo:', error);
