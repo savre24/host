@@ -98,9 +98,10 @@ model ClientService {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
-  renewals       Renewal[]
-  supportTickets SupportTicket[]
-  domainDetail   DomainDetail?
+  renewals          Renewal[]
+  supportTickets    SupportTicket[]
+  domainDetail      DomainDetail?
+  radioServerDetail RadioServerDetail?
 }
 
 enum ServiceStatus {
@@ -117,6 +118,17 @@ model DomainDetail {
   clientService   ClientService @relation(fields: [clientServiceId], references: [id], onDelete: Cascade)
   dnsNameservers  String?
   domainOwnership String?
+  updatedAt       DateTime      @updatedAt
+}
+
+model RadioServerDetail {
+  id              String        @id @default(uuid())
+  clientServiceId String        @unique
+  clientService   ClientService @relation(fields: [clientServiceId], references: [id], onDelete: Cascade)
+  loginUrl        String?
+  username        String?
+  password        String?
+  serverDetails   String?
   updatedAt       DateTime      @updatedAt
 }
 

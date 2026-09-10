@@ -66,6 +66,34 @@ export default async function ClientServiceDetailsPage({ params }) {
                   <DomainActionsClient serviceId={service.id} domainName={serviceName} />
                 </>
               )}
+
+              {service.product?.category?.toUpperCase() === 'RADIO_SERVER' && service.radioServerDetail && (
+                <>
+                  <hr />
+                  <div className="position-relative">
+                    <h4 className="header-title my-3">Radio Server Details</h4>
+                  </div>
+                  <div className="bg-light p-3 rounded border">
+                    {service.radioServerDetail.loginUrl && (
+                      <p><strong>Login URL:</strong> <a href={service.radioServerDetail.loginUrl} target="_blank" rel="noopener noreferrer">{service.radioServerDetail.loginUrl}</a></p>
+                    )}
+                    {service.radioServerDetail.username && (
+                      <p><strong>Username:</strong> {service.radioServerDetail.username}</p>
+                    )}
+                    {service.radioServerDetail.password && (
+                      <p><strong>Password:</strong> {service.radioServerDetail.password}</p>
+                    )}
+                    {service.radioServerDetail.serverDetails && (
+                      <div className="mt-3">
+                        <strong>Configuration Details:</strong>
+                        <pre className="bg-white p-2 border rounded mt-1" style={{ whiteSpace: 'pre-wrap' }}>
+                          {service.radioServerDetail.serverDetails}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

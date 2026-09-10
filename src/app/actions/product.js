@@ -140,7 +140,10 @@ export async function getActiveProducts() {
  */
   export async function assignServiceToClient(clientProfileId, formData) {
     try {
-      const { productId, customName, price, renewalPrice, billingCycle, startDate, expiryDate, notes, autoRenewReminder, applyOnlineCharge, status, autoInvoice } = formData;
+      const { 
+        productId, customName, price, renewalPrice, billingCycle, startDate, expiryDate, notes, autoRenewReminder, applyOnlineCharge, status, autoInvoice,
+        radioLoginUrl, radioUsername, radioPassword, radioServerDetails
+      } = formData;
       const priceFloat = parseFloat(price);
       const renewalPriceFloat = renewalPrice ? parseFloat(renewalPrice) : null;
       const nextDueDateObj = expiryDate ? new Date(expiryDate) : null;
@@ -169,6 +172,18 @@ export async function getActiveProducts() {
         product: true
       }
     });
+
+    if (radioLoginUrl || radioUsername || radioPassword || radioServerDetails) {
+      await prisma.radioServerDetail.create({
+        data: {
+          clientServiceId: newClientService.id,
+          loginUrl: radioLoginUrl || '',
+          username: radioUsername || '',
+          password: radioPassword || '',
+          serverDetails: radioServerDetails || ''
+        }
+      });
+    }
 
     let invoiceId = null;
 
@@ -311,6 +326,7 @@ export async function getClientServiceById(id) {
       include: {
         product: true,
         domainDetail: true,
+        radioServerDetail: true,
         client: {
           include: { user: true }
         }
@@ -329,7 +345,10 @@ export async function getClientServiceById(id) {
  */
 export async function updateClientService(id, formData) {
   try {
-    const { customName, price, renewalPrice, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, applyOnlineCharge, dnsNameservers, domainOwnership } = formData;
+    const { 
+      customName, price, renewalPrice, billingCycle, startDate, expiryDate, status, notes, autoRenewReminder, applyOnlineCharge, dnsNameservers, domainOwnership,
+      radioLoginUrl, radioUsername, radioPassword, radioServerDetails
+    } = formData;
     
     const updateData = {
       customName,
@@ -354,6 +373,25 @@ export async function updateClientService(id, formData) {
           update: {
             dnsNameservers: dnsNameservers || '',
             domainOwnership: domainOwnership || ''
+          }
+        }
+      };
+    }
+
+    if (radioLoginUrl !== undefined || radioUsername !== undefined || radioPassword !== undefined || radioServerDetails !== undefined) {
+      updateData.radioServerDetail = {
+        upsert: {
+          create: {
+            loginUrl: radioLoginUrl || '',
+            username: radioUsername || '',
+            password: radioPassword || '',
+            serverDetails: radioServerDetails || ''
+          },
+          update: {
+            loginUrl: radioLoginUrl || '',
+            username: radioUsername || '',
+            password: radioPassword || '',
+            serverDetails: radioServerDetails || ''
           }
         }
       };

@@ -149,6 +149,32 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
         </Form.Group>
       </Row>
 
+      {selectedProduct?.category === 'RADIO_SERVER' && (
+        <div className="border rounded p-3 mb-4 bg-light">
+          <h5 className="mb-3">Radio Server Details</h5>
+          <Row className="mb-3">
+            <Form.Group as={Col} md="6" controlId="radioLoginUrl">
+              <Form.Label>Azuracast Login ID / Radio Login Link</Form.Label>
+              <Form.Control type="url" name="radioLoginUrl" placeholder="https://azuracast.example.com" />
+            </Form.Group>
+            <Form.Group as={Col} md="6" controlId="radioUsername">
+              <Form.Label>Username</Form.Label>
+              <Form.Control type="text" name="radioUsername" placeholder="e.g. admin" />
+            </Form.Group>
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} md="6" controlId="radioPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control type="text" name="radioPassword" placeholder="e.g. password123" />
+            </Form.Group>
+            <Form.Group as={Col} md="6" controlId="radioServerDetails">
+              <Form.Label>Radio Server Details</Form.Label>
+              <Form.Control as="textarea" rows={2} name="radioServerDetails" placeholder="Stream URL, IP, Port, etc." />
+            </Form.Group>
+          </Row>
+        </div>
+      )}
+
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
         <Button variant="primary" type="submit" disabled={isPending}>
           {isPending ? 'Assigning...' : 'Assign Service'}
