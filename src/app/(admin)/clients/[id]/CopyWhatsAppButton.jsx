@@ -7,8 +7,11 @@ import { toast } from 'react-toastify';
 const CopyWhatsAppButton = ({ client, invoices }) => {
   const [copied, setCopied] = useState(false);
 
-  const pendingInvoices = invoices?.filter(i => i.status === 'PENDING' || i.status === 'PARTIALLY_PAID') || [];
-  const totalPending = pendingInvoices.reduce((sum, inv) => sum + inv.total, 0).toFixed(2);
+  const pendingInvoices = invoices?.filter(i => i.status === 'PENDING' || i.status === 'PARTIALLY_PAID' || i.status === 'OVERDUE') || [];
+  const totalPending = pendingInvoices.reduce((sum, inv) => {
+    const paid = inv.payments ? inv.payments.reduce((pSum, p) => pSum + p.amount, 0) : 0;
+    return sum + (inv.total - paid);
+  }, 0).toFixed(2);
 
   const handleCopy = () => {
     if (pendingInvoices.length === 0) {
@@ -25,7 +28,12 @@ const CopyWhatsAppButton = ({ client, invoices }) => {
           message += `   - ${item.description}: ₹${item.total.toFixed(2)}\n`;
         });
       }
-      message += `   *Amount Due: ₹${inv.total.toFixed(2)}*\n\n`;
+      if (inv.payments && inv.payments.length > 0) {
+        const paid = inv.payments.reduce((pSum, p) => pSum + p.amount, 0);
+        message += `   *Amount Due: ₹${(inv.total - paid).toFixed(2)}*\n\n`;
+      } else {
+        message += `   *Amount Due: ₹${inv.total.toFixed(2)}*\n\n`;
+      }
     });
 
     message += `*Total Pending Amount: ₹${totalPending}*\n\n`;

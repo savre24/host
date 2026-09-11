@@ -61,7 +61,10 @@ const ClientViewPage = async ({ params }) => {
                 <h6 className="text-uppercase text-muted mb-3">Billing Overview</h6>
                 <div className="p-3 bg-light rounded d-flex justify-content-between align-items-center">
                   <span className="fw-medium text-muted">Total Pending</span>
-                  <h4 className="mb-0 text-danger">₹{profile.invoices ? profile.invoices.filter(i => i.status === 'PENDING' || i.status === 'PARTIALLY_PAID').reduce((sum, inv) => sum + inv.total, 0).toFixed(2) : '0.00'}</h4>
+                  <h4 className="mb-0 text-danger">₹{profile.invoices ? profile.invoices.filter(i => i.status === 'PENDING' || i.status === 'PARTIALLY_PAID' || i.status === 'OVERDUE').reduce((sum, inv) => {
+                    const paid = inv.payments ? inv.payments.reduce((pSum, p) => pSum + p.amount, 0) : 0;
+                    return sum + (inv.total - paid);
+                  }, 0).toFixed(2) : '0.00'}</h4>
                 </div>
               </div>
 

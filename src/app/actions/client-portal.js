@@ -22,9 +22,15 @@ export async function getClientDashboardStats(userId) {
       where: { clientId: profile.id, status: 'ACTIVE' }
     });
 
-    const pendingInvoices = await prisma.invoice.aggregate({
-      where: { clientId: profile.id, status: 'PENDING' },
-      _sum: { total: true }
+    const pendingInvoicesData = await prisma.invoice.findMany({
+      where: { clientId: profile.id, status: { in: ['PENDING', 'PARTIALLY_PAID', 'OVERDUE'] } },
+      include: { payments: true }
+    });
+
+    let calculatedPendingBalance = 0;
+    pendingInvoicesData.forEach(inv => {
+      const paid = inv.payments ? inv.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
+      calculatedPendingBalance += (inv.total - paid);
     });
 
     const openTickets = await prisma.supportTicket.count({
@@ -42,6 +48,7 @@ export async function getClientDashboardStats(userId) {
 
     const pendingInvoicesList = await prisma.invoice.findMany({
       where: { clientId: profile.id, status: { in: ['PENDING', 'OVERDUE', 'PARTIALLY_PAID'] } },
+      include: { payments: true },
       orderBy: { dueDate: 'asc' },
       take: 5
     });
@@ -61,7 +68,7 @@ export async function getClientDashboardStats(userId) {
       success: true,
       data: {
         activeServices,
-        pendingBalance: pendingInvoices._sum.total || 0,
+        pendingBalance: calculatedPendingBalance,
         openTickets,
         latestInvoice,
         pendingInvoicesList,

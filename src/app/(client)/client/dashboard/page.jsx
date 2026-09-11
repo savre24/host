@@ -105,7 +105,7 @@ const ClientDashboard = async () => {
                       <tr>
                         <th>Invoice #</th>
                         <th>Due Date</th>
-                        <th>Amount</th>
+                        <th>Amount Due</th>
                         <th>Status</th>
                         <th>Action</th>
                       </tr>
@@ -115,7 +115,7 @@ const ClientDashboard = async () => {
                         <tr key={invoice.id}>
                           <td><Link href={`/client/invoices/${invoice.id}`} className="text-body fw-bold">#{invoice.invoiceNumber}</Link></td>
                           <td>{new Date(invoice.dueDate).toLocaleDateString()}</td>
-                          <td>₹{invoice.total.toFixed(2)}</td>
+                          <td>₹{(invoice.total - (invoice.payments ? invoice.payments.reduce((sum, p) => sum + p.amount, 0) : 0)).toFixed(2)}</td>
                           <td>
                             <span className={`badge ${
                               invoice.status === 'PENDING' ? 'bg-warning' : 

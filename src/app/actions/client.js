@@ -138,7 +138,8 @@ export async function getClientById(userId) {
             quotations: true,
             invoices: {
               include: {
-                items: true
+                items: true,
+                payments: true
               }
             },
             payments: true,
