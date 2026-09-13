@@ -54,8 +54,12 @@ export async function createWhatsAppInstance(instanceName = 'crm-main') {
 
       if (!createRes.ok) {
         const errorText = await createRes.text();
-        console.error('Evolution API create instance error:', errorText);
-        return { error: `Failed to create instance on Evolution API: ${errorText}` };
+        if (createRes.status === 403 && errorText.includes('already in use')) {
+          console.log('Instance already exists on Evolution API, proceeding to connect');
+        } else {
+          console.error('Evolution API create instance error:', errorText);
+          return { error: `Failed to create instance on Evolution API: ${errorText}` };
+        }
       }
     }
 
