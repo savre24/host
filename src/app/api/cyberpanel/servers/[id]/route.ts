@@ -65,7 +65,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ success: true, data: updatedServer });
   } catch (error: any) {
     console.error('Error updating CyberPanel server:', error);
-    return NextResponse.json({ success: false, message: 'Failed to update server' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to update server: ' + (error?.message || String(error)) }, { status: 500 });
   }
 }
 
