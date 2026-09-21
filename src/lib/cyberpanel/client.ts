@@ -27,71 +27,66 @@ export async function cyberPanelRequest<T = any>(
     endpoint = `/${endpoint}`;
   }
 
-  // 1. Fetch initial CSRF token and Session ID
-  const initialResponse = await fetch(`${url}/`, {
-    method: 'GET',
-  });
+  const isApiKey = password.startsWith('Basic cp_api_') || password.startsWith('cp_api_');
+  const actualApiKey = password.startsWith('Basic ') ? password : (password.startsWith('cp_api_') ? `Basic ${password}` : null);
 
-  const cookies = initialResponse.headers.get('set-cookie');
-  if (!cookies) {
-    throw new Error('Failed to retrieve initial cookies from CyberPanel');
-  }
-
-  const csrfMatch = cookies.match(/csrftoken=([^;]+)/);
-  const sessionMatch = cookies.match(/cyberpanel_sessionid=([^;]+)/);
-
-  if (!csrfMatch) {
-    throw new Error('Failed to parse CSRF token from initial response');
-  }
-
-  const initialCsrfToken = csrfMatch[1];
-  const initialSessionId = sessionMatch ? sessionMatch[1] : '';
-
-  // 2. Perform Login Request
-  const loginPayload = {
-    username: username,
-    password: password
+  let headers: Record<string, string> = {
+    'Content-Type': 'application/json',
   };
 
-  const initialCookies = [`csrftoken=${initialCsrfToken}`];
-  if (initialSessionId) {
-    initialCookies.push(`cyberpanel_sessionid=${initialSessionId}`);
+  let initialCsrfToken = '';
+  let authSessionId = '';
+
+  if (actualApiKey) {
+    // Modern API Key approach
+    headers['Authorization'] = actualApiKey;
+  } else {
+    // Legacy CSRF/Session approach
+    const initialResponse = await fetch(`${url}/`, { method: 'GET' });
+    const cookies = initialResponse.headers.get('set-cookie');
+    if (!cookies) throw new Error('Failed to retrieve initial cookies from CyberPanel');
+    
+    const csrfMatch = cookies.match(/csrftoken=([^;]+)/);
+    const sessionMatch = cookies.match(/cyberpanel_sessionid=([^;]+)/);
+    if (!csrfMatch) throw new Error('Failed to parse CSRF token from initial response');
+    
+    initialCsrfToken = csrfMatch[1];
+    const initialSessionId = sessionMatch ? sessionMatch[1] : '';
+
+    const loginPayload = { username, password };
+    const initialCookies = [`csrftoken=${initialCsrfToken}`];
+    if (initialSessionId) initialCookies.push(`cyberpanel_sessionid=${initialSessionId}`);
+
+    const loginResponse = await fetch(`${url}/verifyLogin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': initialCookies.join('; '),
+        'X-CSRFToken': initialCsrfToken,
+        'Referer': `${url}/`,
+      },
+      body: JSON.stringify(loginPayload),
+    });
+
+    const loginCookies = loginResponse.headers.get('set-cookie');
+    if (!loginCookies) throw new Error('Failed to retrieve authenticated cookies from CyberPanel');
+    
+    const authSessionMatch = loginCookies.match(/cyberpanel_sessionid=([^;]+)/);
+    if (!authSessionMatch) throw new Error('Failed to parse authenticated Session ID');
+    
+    authSessionId = authSessionMatch[1];
+    
+    headers['Cookie'] = `csrftoken=${initialCsrfToken}; cyberpanel_sessionid=${authSessionId}`;
+    headers['X-CSRFToken'] = initialCsrfToken;
+    headers['Referer'] = `${url}/`;
   }
-
-  const loginResponse = await fetch(`${url}/verifyLogin`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Cookie': initialCookies.join('; '),
-      'X-CSRFToken': initialCsrfToken,
-      'Referer': `${url}/`,
-    },
-    body: JSON.stringify(loginPayload),
-  });
-
-  const loginCookies = loginResponse.headers.get('set-cookie');
-  if (!loginCookies) {
-    throw new Error('Failed to retrieve authenticated cookies from CyberPanel');
-  }
-
-  const authSessionMatch = loginCookies.match(/cyberpanel_sessionid=([^;]+)/);
-  if (!authSessionMatch) {
-    throw new Error('Failed to parse authenticated Session ID');
-  }
-
-  const authSessionId = authSessionMatch[1];
 
   // 3. Make the Actual API Request
   const apiPayload = { ...payload };
 
   const apiResponse = await fetch(`${url}${endpoint}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Cookie': `csrftoken=${initialCsrfToken}; cyberpanel_sessionid=${authSessionId}`,
-      'X-CSRFToken': initialCsrfToken,
-      'Referer': `${url}/`,
-    },
+    headers: headers,
     body: JSON.stringify(apiPayload),
   });
 

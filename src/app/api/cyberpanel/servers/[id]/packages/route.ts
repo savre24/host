@@ -33,8 +33,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       password: plaintextPassword
     };
 
-    // Use /api/listPackage which requires adminUser
-    const res = await cyberPanelRequest('/api/listPackage', { adminUser: server.username }, config);
+    // Use /api/listPackage which requires adminUser and adminPass
+    const res = await cyberPanelRequest('/api/listPackage', { 
+      adminUser: server.username, 
+      adminPass: plaintextPassword 
+    }, config);
     
     // cyberpanel API typically returns an array directly or inside a wrapper. 
     // Usually listPackage returns the JSON array string, which we parse.
