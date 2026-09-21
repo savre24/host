@@ -4,6 +4,7 @@ import DomainActionsClient from './DomainActionsClient';
 import DomainInfoEditableClient from './DomainInfoEditableClient';
 import Link from 'next/link';
 import PageTitle from '@/components/PageTitle';
+import CyberPanelDashboard from './CyberPanelDashboard';
 
 export const metadata = {
   title: 'Service Details'
@@ -93,6 +94,10 @@ export default async function ClientServiceDetailsPage({ params }) {
                     )}
                   </div>
                 </>
+              )}
+
+              {service.cyberPanelDetail && (
+                <CyberPanelDashboard service={service} />
               )}
             </div>
           </div>
