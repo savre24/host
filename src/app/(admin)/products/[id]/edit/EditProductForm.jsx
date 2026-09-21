@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
-import CyberPanelProductFields from '../CyberPanelProductFields';
+import CyberPanelProductFields from '../../CyberPanelProductFields';
 
 const EditProductForm = ({ product }) => {
   const router = useRouter();

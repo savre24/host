@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Trash2 } from "lucide-react";
+import { Button, Form, Card, Table, Spinner, Row, Col } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { Icon } from '@iconify/react';
 
 export function FTPManager({ serviceId }) {
-  const { toast } = useToast();
   const [ftpAccounts, setFtpAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +19,7 @@ export function FTPManager({ serviceId }) {
       if (!res.ok) throw new Error(data.error);
       setFtpAccounts(data || []);
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to fetch FTP accounts");
     } finally {
       setIsLoading(false);
     }
@@ -46,11 +41,11 @@ export function FTPManager({ serviceId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      toast({ title: "Success", description: "FTP account created successfully" });
+      toast.success("FTP account created successfully");
       setFormData({ ftpUsername: "", ftpPassword: "", path: "/" });
       fetchFTPs();
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to create FTP account");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,94 +62,95 @@ export function FTPManager({ serviceId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      toast({ title: "Success", description: "FTP account deleted successfully" });
+      toast.success("FTP account deleted successfully");
       fetchFTPs();
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to delete FTP account");
     }
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New FTP Account</CardTitle>
-          <CardDescription>Create a new FTP user to access your website files</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreate} className="space-y-4 max-w-sm">
-            <div className="space-y-2">
-              <Label htmlFor="ftpUsername">FTP Username (suffix)</Label>
-              <Input
-                id="ftpUsername"
-                value={formData.ftpUsername}
-                onChange={(e) => setFormData({ ...formData, ftpUsername: e.target.value })}
-                placeholder="ftp1"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="path">Path (relative to /home/domain.com)</Label>
-              <Input
-                id="path"
-                value={formData.path}
-                onChange={(e) => setFormData({ ...formData, path: e.target.value })}
-                placeholder="public_html"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ftpPassword">Password</Label>
-              <Input
-                id="ftpPassword"
-                type="password"
-                value={formData.ftpPassword}
-                onChange={(e) => setFormData({ ...formData, ftpPassword: e.target.value })}
-                required
-              />
-            </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+    <div>
+      <Card className="mb-4">
+        <Card.Header>
+          <h5 className="mb-0">Create New FTP Account</h5>
+          <small className="text-muted">Create a new FTP user to access your website files</small>
+        </Card.Header>
+        <Card.Body>
+          <Form onSubmit={handleCreate}>
+            <Row className="mb-3">
+              <Form.Group as={Col} md={4}>
+                <Form.Label>FTP Username (suffix)</Form.Label>
+                <Form.Control
+                  value={formData.ftpUsername}
+                  onChange={(e) => setFormData({ ...formData, ftpUsername: e.target.value })}
+                  placeholder="ftp1"
+                  required
+                />
+              </Form.Group>
+              <Form.Group as={Col} md={4}>
+                <Form.Label>Path (relative to /home/domain.com)</Form.Label>
+                <Form.Control
+                  value={formData.path}
+                  onChange={(e) => setFormData({ ...formData, path: e.target.value })}
+                  placeholder="public_html"
+                  required
+                />
+              </Form.Group>
+              <Form.Group as={Col} md={4}>
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={formData.ftpPassword}
+                  onChange={(e) => setFormData({ ...formData, ftpPassword: e.target.value })}
+                  required
+                />
+              </Form.Group>
+            </Row>
+            <Button type="submit" disabled={isSubmitting} variant="primary">
+              {isSubmitting && <Spinner animation="border" size="sm" className="me-2" />}
               Create FTP Account
             </Button>
-          </form>
-        </CardContent>
+          </Form>
+        </Card.Body>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Existing FTP Accounts</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <Card.Header>
+          <h5 className="mb-0">Existing FTP Accounts</h5>
+        </Card.Header>
+        <Card.Body>
           {isLoading ? (
-            <div className="flex justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            <div className="text-center p-4">
+              <Spinner animation="border" variant="secondary" />
+            </div>
           ) : ftpAccounts.length === 0 ? (
-            <p className="text-muted-foreground">No FTP accounts found.</p>
+            <p className="text-muted mb-0">No FTP accounts found.</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Path</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <Table responsive hover>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Path</th>
+                  <th className="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
                 {ftpAccounts.map((ftp, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{ftp.ftpUsername}</TableCell>
-                    <TableCell>{ftp.path}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(ftp.ftpUsername)}>
-                        <Trash2 className="h-4 w-4" />
+                  <tr key={idx}>
+                    <td>{ftp.ftpUsername}</td>
+                    <td>{ftp.path}</td>
+                    <td className="text-end">
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(ftp.ftpUsername)}>
+                        <Icon icon="tabler:trash" />
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
+              </tbody>
             </Table>
           )}
-        </CardContent>
+        </Card.Body>
       </Card>
     </div>
   );

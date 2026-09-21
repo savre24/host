@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, HardDrive, Globe, Server, Activity, ArrowUpRight } from "lucide-react";
+import { Card, Row, Col, Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { Icon } from '@iconify/react';
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export function OverviewStats({ serviceId }) {
-  const { toast } = useToast();
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +18,7 @@ export function OverviewStats({ serviceId }) {
       if (!res.ok) throw new Error(data.error);
       setStats(data);
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to fetch website overview");
     } finally {
       setIsLoading(false);
     }
@@ -31,66 +29,74 @@ export function OverviewStats({ serviceId }) {
   }, [serviceId]);
 
   if (isLoading) {
-    return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
+    return (
+      <div className="text-center p-5">
+        <Spinner animation="border" variant="secondary" />
+      </div>
+    );
   }
 
   if (!stats) {
-    return <p className="text-muted-foreground">Unable to fetch website overview.</p>;
+    return <p className="text-muted">Unable to fetch website overview.</p>;
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Domain</CardTitle>
-          <Globe className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-xl font-bold">{stats.domain}</div>
-          <Link href={`http://${stats.domain}`} target="_blank" className="text-xs text-primary flex items-center hover:underline mt-1">
-            Visit Website <ArrowUpRight className="h-3 w-3 ml-1" />
-          </Link>
-        </CardContent>
-      </Card>
+    <Row className="g-4">
+      <Col md={6} lg={3}>
+        <Card className="h-100">
+          <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h6 className="mb-0 text-muted">Domain</h6>
+              <Icon icon="tabler:world" className="text-muted fs-4" />
+            </div>
+            <h4 className="fw-bold mb-1">{stats.domain}</h4>
+            <Link href={`http://${stats.domain}`} target="_blank" className="text-primary text-decoration-none small d-flex align-items-center">
+              Visit Website <Icon icon="tabler:arrow-up-right" className="ms-1" />
+            </Link>
+          </Card.Body>
+        </Card>
+      </Col>
       
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Status</CardTitle>
-          <Activity className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.state === "Active" ? (
-              <span className="text-green-500">Active</span>
-            ) : (
-              <span className="text-destructive">{stats.state}</span>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground">Package: {stats.package}</p>
-        </CardContent>
-      </Card>
+      <Col md={6} lg={3}>
+        <Card className="h-100">
+          <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h6 className="mb-0 text-muted">Status</h6>
+              <Icon icon="tabler:activity" className="text-muted fs-4" />
+            </div>
+            <h4 className={`fw-bold mb-1 ${stats.state === 'Active' ? 'text-success' : 'text-danger'}`}>
+              {stats.state}
+            </h4>
+            <p className="text-muted small mb-0">Package: {stats.package}</p>
+          </Card.Body>
+        </Card>
+      </Col>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Server IP</CardTitle>
-          <Server className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.ipAddress}</div>
-          <p className="text-xs text-muted-foreground">PHP: {stats.phpVersion || 'N/A'}</p>
-        </CardContent>
-      </Card>
+      <Col md={6} lg={3}>
+        <Card className="h-100">
+          <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h6 className="mb-0 text-muted">Server IP</h6>
+              <Icon icon="tabler:server" className="text-muted fs-4" />
+            </div>
+            <h4 className="fw-bold mb-1">{stats.ipAddress}</h4>
+            <p className="text-muted small mb-0">PHP: {stats.phpVersion || 'N/A'}</p>
+          </Card.Body>
+        </Card>
+      </Col>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Disk Usage</CardTitle>
-          <HardDrive className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.diskUsed || '0MB'}</div>
-          <p className="text-xs text-muted-foreground">Total used space</p>
-        </CardContent>
-      </Card>
-    </div>
+      <Col md={6} lg={3}>
+        <Card className="h-100">
+          <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h6 className="mb-0 text-muted">Disk Usage</h6>
+              <Icon icon="tabler:device-floppy" className="text-muted fs-4" />
+            </div>
+            <h4 className="fw-bold mb-1">{stats.diskUsed || '0MB'}</h4>
+            <p className="text-muted small mb-0">Total used space</p>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
   );
 }

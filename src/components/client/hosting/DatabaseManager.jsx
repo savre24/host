@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Trash2 } from "lucide-react";
+import { Button, Form, Card, Table, Spinner, Row, Col } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { Icon } from '@iconify/react';
 
 export function DatabaseManager({ serviceId }) {
-  const { toast } = useToast();
   const [databases, setDatabases] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +19,7 @@ export function DatabaseManager({ serviceId }) {
       if (!res.ok) throw new Error(data.error);
       setDatabases(data || []);
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to fetch databases");
     } finally {
       setIsLoading(false);
     }
@@ -46,11 +41,11 @@ export function DatabaseManager({ serviceId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      toast({ title: "Success", description: "Database created successfully" });
+      toast.success("Database created successfully");
       setFormData({ dbName: "", dbUser: "", dbPassword: "" });
       fetchDatabases();
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to create database");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,94 +62,95 @@ export function DatabaseManager({ serviceId }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      toast({ title: "Success", description: "Database deleted successfully" });
+      toast.success("Database deleted successfully");
       fetchDatabases();
     } catch (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message || "Failed to delete database");
     }
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Database</CardTitle>
-          <CardDescription>Create a new MySQL database and user</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreate} className="space-y-4 max-w-sm">
-            <div className="space-y-2">
-              <Label htmlFor="dbName">Database Name (suffix)</Label>
-              <Input
-                id="dbName"
-                value={formData.dbName}
-                onChange={(e) => setFormData({ ...formData, dbName: e.target.value })}
-                placeholder="db1"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dbUser">Database User (suffix)</Label>
-              <Input
-                id="dbUser"
-                value={formData.dbUser}
-                onChange={(e) => setFormData({ ...formData, dbUser: e.target.value })}
-                placeholder="user1"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dbPassword">Password</Label>
-              <Input
-                id="dbPassword"
-                type="password"
-                value={formData.dbPassword}
-                onChange={(e) => setFormData({ ...formData, dbPassword: e.target.value })}
-                required
-              />
-            </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+    <div>
+      <Card className="mb-4">
+        <Card.Header>
+          <h5 className="mb-0">Create New Database</h5>
+          <small className="text-muted">Create a new MySQL database and user</small>
+        </Card.Header>
+        <Card.Body>
+          <Form onSubmit={handleCreate}>
+            <Row className="mb-3">
+              <Form.Group as={Col} md={4}>
+                <Form.Label>Database Name (suffix)</Form.Label>
+                <Form.Control
+                  value={formData.dbName}
+                  onChange={(e) => setFormData({ ...formData, dbName: e.target.value })}
+                  placeholder="db1"
+                  required
+                />
+              </Form.Group>
+              <Form.Group as={Col} md={4}>
+                <Form.Label>Database User (suffix)</Form.Label>
+                <Form.Control
+                  value={formData.dbUser}
+                  onChange={(e) => setFormData({ ...formData, dbUser: e.target.value })}
+                  placeholder="user1"
+                  required
+                />
+              </Form.Group>
+              <Form.Group as={Col} md={4}>
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={formData.dbPassword}
+                  onChange={(e) => setFormData({ ...formData, dbPassword: e.target.value })}
+                  required
+                />
+              </Form.Group>
+            </Row>
+            <Button type="submit" disabled={isSubmitting} variant="primary">
+              {isSubmitting && <Spinner animation="border" size="sm" className="me-2" />}
               Create Database
             </Button>
-          </form>
-        </CardContent>
+          </Form>
+        </Card.Body>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Existing Databases</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <Card.Header>
+          <h5 className="mb-0">Existing Databases</h5>
+        </Card.Header>
+        <Card.Body>
           {isLoading ? (
-            <div className="flex justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            <div className="text-center p-4">
+              <Spinner animation="border" variant="secondary" />
+            </div>
           ) : databases.length === 0 ? (
-            <p className="text-muted-foreground">No databases found.</p>
+            <p className="text-muted mb-0">No databases found.</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Database Name</TableHead>
-                  <TableHead>Database User</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <Table responsive hover>
+              <thead>
+                <tr>
+                  <th>Database Name</th>
+                  <th>Database User</th>
+                  <th className="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
                 {databases.map((db, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{db.dbName}</TableCell>
-                    <TableCell>{db.dbUser}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(db.dbName)}>
-                        <Trash2 className="h-4 w-4" />
+                  <tr key={idx}>
+                    <td>{db.dbName}</td>
+                    <td>{db.dbUser}</td>
+                    <td className="text-end">
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(db.dbName)}>
+                        <Icon icon="tabler:trash" />
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
+              </tbody>
             </Table>
           )}
-        </CardContent>
+        </Card.Body>
       </Card>
     </div>
   );

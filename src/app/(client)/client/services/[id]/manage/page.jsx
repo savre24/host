@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tab, Tabs } from "react-bootstrap";
 import { OverviewStats } from "@/components/client/hosting/OverviewStats";
 import { DatabaseManager } from "@/components/client/hosting/DatabaseManager";
 import { FTPManager } from "@/components/client/hosting/FTPManager";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Icon } from '@iconify/react';
 
 export default function ManageHostingPage() {
   const params = useParams();
@@ -16,40 +15,32 @@ export default function ManageHostingPage() {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center text-sm text-muted-foreground mb-2">
-            <Link href="/client/services" className="hover:text-primary flex items-center">
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Back to Services
-            </Link>
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight">Manage Hosting</h2>
-          <p className="text-muted-foreground">
-            Manage your website, databases, and FTP accounts.
-          </p>
+    <div className="container-fluid p-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <Link href="/client/services" className="text-muted text-decoration-none d-flex align-items-center mb-2">
+            <Icon icon="tabler:arrow-left" className="me-1" />
+            Back to Services
+          </Link>
+          <h2 className="fw-bold mb-1">Manage Hosting</h2>
+          <p className="text-muted">Manage your website, databases, and FTP accounts.</p>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="databases">Databases</TabsTrigger>
-          <TabsTrigger value="ftp">FTP Accounts</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="space-y-4">
+      <Tabs 
+        activeKey={activeTab} 
+        onSelect={(k) => setActiveTab(k)} 
+        className="mb-4"
+      >
+        <Tab eventKey="overview" title="Overview">
           <OverviewStats serviceId={serviceId} />
-        </TabsContent>
-        
-        <TabsContent value="databases" className="space-y-4">
+        </Tab>
+        <Tab eventKey="databases" title="Databases">
           <DatabaseManager serviceId={serviceId} />
-        </TabsContent>
-        
-        <TabsContent value="ftp" className="space-y-4">
+        </Tab>
+        <Tab eventKey="ftp" title="FTP Accounts">
           <FTPManager serviceId={serviceId} />
-        </TabsContent>
+        </Tab>
       </Tabs>
     </div>
   );
