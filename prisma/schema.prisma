@@ -391,7 +391,7 @@ model CyberPanelServer {
   name         String   @unique
   url          String
   username     String
-  passwordEnc  String
+  passwordEnc  String   @db.Text
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
