@@ -9,7 +9,7 @@ export default function CyberPanelProductFields({ defaultServerId = '', defaultP
   const [loadingServers, setLoadingServers] = useState(true);
   
   const [packages, setPackages] = useState([]);
-  const [phpVersions, setPhpVersions] = useState(['PHP 7.4', 'PHP 8.0', 'PHP 8.1', 'PHP 8.2', 'PHP 8.3']);
+  const [phpVersions, setPhpVersions] = useState(['PHP 7.4', 'PHP 8.0', 'PHP 8.1', 'PHP 8.2', 'PHP 8.3', 'PHP 8.4', 'PHP 8.5']);
   const [loadingPackages, setLoadingPackages] = useState(false);
 
   const [serverId, setServerId] = useState(defaultServerId);
