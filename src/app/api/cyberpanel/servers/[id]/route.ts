@@ -42,7 +42,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     };
     
     if (isActive !== undefined) {
-      updateData.isActive = isActive;
+      updateData.isActive = typeof isActive === 'string' ? isActive === 'true' : Boolean(isActive);
     }
 
     // Only update password if a new one is provided.
