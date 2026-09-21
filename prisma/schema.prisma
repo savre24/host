@@ -100,8 +100,9 @@ model ClientService {
 
   renewals          Renewal[]
   supportTickets    SupportTicket[]
-  domainDetail      DomainDetail?
-  radioServerDetail RadioServerDetail?
+  domainDetail        DomainDetail?
+  radioServerDetail   RadioServerDetail?
+  cyberPanelDetail    CyberPanelHostingDetail?
 }
 
 enum ServiceStatus {
@@ -379,4 +380,36 @@ model WhatsAppSetting {
   templatePaymentReminder String?  @db.Text
   templatePaymentReceived String?  @db.Text
   updatedAt               DateTime @updatedAt
+}
+
+model CyberPanelServer {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  url          String
+  username     String
+  passwordEnc  String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  cyberPanelHostingDetails CyberPanelHostingDetail[]
+}
+
+model CyberPanelHostingDetail {
+  id               String           @id @default(uuid())
+  clientServiceId  String           @unique
+  clientService    ClientService    @relation(fields: [clientServiceId], references: [id], onDelete: Cascade)
+  
+  serverId         String
+  server           CyberPanelServer @relation(fields: [serverId], references: [id])
+  
+  domainName       String
+  username         String           // CyberPanel account username for the client
+  packageName      String           // e.g., "Default"
+  phpVersion       String           // e.g., "PHP 8.1"
+  status           String?          // e.g., "Active", "Suspended"
+  sslEnabled       Boolean          @default(false)
+  
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }

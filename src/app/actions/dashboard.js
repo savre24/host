@@ -17,11 +17,17 @@ export async function getAdminDashboardStats() {
       where: { status: 'ACTIVE' }
     });
 
-    const pendingInvoices = await prisma.invoice.aggregate({
+    const pendingInvoicesData = await prisma.invoice.findMany({
       where: { 
         status: { in: ['PENDING', 'OVERDUE', 'PARTIALLY_PAID'] } 
       },
-      _sum: { total: true }
+      include: { payments: true }
+    });
+
+    let calculatedPendingRevenue = 0;
+    pendingInvoicesData.forEach(inv => {
+      const paid = inv.payments ? inv.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
+      calculatedPendingRevenue += (inv.total - paid);
     });
 
     const openTickets = await prisma.supportTicket.count({
@@ -33,7 +39,7 @@ export async function getAdminDashboardStats() {
       data: {
         totalClients,
         activeServices,
-        pendingRevenue: pendingInvoices._sum.total || 0,
+        pendingRevenue: calculatedPendingRevenue,
         openTickets
       }
     };

@@ -327,6 +327,9 @@ export async function getClientServiceById(id) {
         product: true,
         domainDetail: true,
         radioServerDetail: true,
+        cyberPanelDetail: {
+          include: { server: true }
+        },
         client: {
           include: { user: true }
         }

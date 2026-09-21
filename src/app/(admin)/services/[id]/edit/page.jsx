@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Col, Row } from 'react-bootstrap';
 import EditClientServiceForm from './EditClientServiceForm';
+import CyberPanelProvisionForm from './CyberPanelProvisionForm';
 
 export const metadata = {
   title: 'Edit Assigned Service',
@@ -26,7 +27,6 @@ const EditClientServicePage = async ({ params }) => {
       <PageTitle title={`Edit Service for ${clientName}`} subTitle="Client Services" />
       <Row className="mb-3">
         <Col>
-          {/* We use a standard link back to the client profile */}
           <Link href={`/clients/${service.client?.userId || ''}`} className="btn btn-outline-secondary me-2">
             <IconifyIcon icon="tabler:arrow-left" width={18} height={18} className="me-1" /> Back to Profile
           </Link>
@@ -38,6 +38,9 @@ const EditClientServicePage = async ({ params }) => {
       
       <Row>
         <Col lg={8} className="mx-auto">
+          {/* CyberPanel Provisioning Section */}
+          <CyberPanelProvisionForm service={service} />
+          
           <ComponentContainerCard title="Update Service Details">
             <EditClientServiceForm service={service} />
           </ComponentContainerCard>

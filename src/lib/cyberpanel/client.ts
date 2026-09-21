@@ -1,118 +1,108 @@
-/**
- * Core CyberPanel API Client (Session Based)
- */
-
-const CYBERPANEL_URL = process.env.CYBERPANEL_URL?.replace(/\/$/, ""); 
-const CYBERPANEL_USERNAME = process.env.CYBERPANEL_USERNAME;
-const CYBERPANEL_PASSWORD = process.env.CYBERPANEL_PASSWORD;
-
-type CyberPanelResponse<T = any> = {
-  success: boolean;
-  data?: T;
-  error?: string;
-};
-
-/**
- * Helper to safely extract a cookie value from Set-Cookie header
- */
-function extractCookie(cookieString: string | null, cookieName: string): string | null {
-  if (!cookieString) return null;
-  const match = cookieString.match(new RegExp(`${cookieName}=([^;]+)`));
-  return match ? match[1] : null;
+export interface CyberPanelServerConfig {
+  url: string;
+  username: string;
+  password: string; // The decrypted plaintext password, existing only in memory
 }
 
-/**
- * Establish a session and return the headers/cookies needed for API calls
- */
-async function getCyberPanelSession(controller: AbortController) {
-  if (!CYBERPANEL_URL || !CYBERPANEL_USERNAME || !CYBERPANEL_PASSWORD) {
-    throw new Error("Missing credentials");
-  }
-
-  // Step 1: Get initial CSRF token
-  const initialRes = await fetch(`${CYBERPANEL_URL}/`, {
-    method: "GET",
-    signal: controller.signal,
-  });
-  
-  const initialCookies = initialRes.headers.get("set-cookie");
-  const csrfToken = extractCookie(initialCookies, "csrftoken");
-
-  if (!csrfToken) {
-    throw new Error("Failed to obtain CSRF token");
-  }
-
-  // Step 2: Login to get session ID
-  const loginRes = await fetch(`${CYBERPANEL_URL}/verifyLogin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken,
-      "Referer": `${CYBERPANEL_URL}/`,
-      "Origin": CYBERPANEL_URL,
-      "Cookie": `csrftoken=${csrfToken}`,
-    },
-    body: JSON.stringify({
-      username: CYBERPANEL_USERNAME,
-      password: CYBERPANEL_PASSWORD,
-    }),
-    signal: controller.signal,
-  });
-
-  const loginCookies = loginRes.headers.get("set-cookie");
-  const sessionToken = extractCookie(loginCookies, "cyberpanel_sessionid");
-
-  if (!sessionToken) {
-    throw new Error("Failed to authenticate session");
-  }
-
-  return {
-    csrfToken,
-    sessionToken,
-  };
+export interface CyberPanelResponse<T = any> {
+  error_message: string | null;
+  [key: string]: any;
 }
 
-/**
- * Make a secure POST request to CyberPanel with automatic session handling
- */
 export async function cyberPanelRequest<T = any>(
-  endpoint: string,
-  payload: Record<string, any> = {}
+  endpoint: string, 
+  payload: any = {}, 
+  server: CyberPanelServerConfig
 ): Promise<CyberPanelResponse<T>> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const url = server.url;
+  const username = server.username;
+  const password = server.password;
+  
+  if (!url || !username || !password) {
+    throw new Error('Incomplete CyberPanel Server configuration. Check URL, Username, and Password.');
+  }
 
+  // Ensure endpoint starts with slash
+  if (!endpoint.startsWith('/')) {
+    endpoint = `/${endpoint}`;
+  }
+
+  // 1. Fetch initial CSRF token and Session ID
+  const initialResponse = await fetch(`${url}/`, {
+    method: 'GET',
+  });
+
+  const cookies = initialResponse.headers.get('set-cookie');
+  if (!cookies) {
+    throw new Error('Failed to retrieve initial cookies from CyberPanel');
+  }
+
+  const csrfMatch = cookies.match(/csrftoken=([^;]+)/);
+  const sessionMatch = cookies.match(/cyberpanel_sessionid=([^;]+)/);
+
+  if (!csrfMatch || !sessionMatch) {
+    throw new Error('Failed to parse CSRF or Session ID from initial response');
+  }
+
+  const initialCsrfToken = csrfMatch[1];
+  const initialSessionId = sessionMatch[1];
+
+  // 2. Perform Login Request
+  const loginPayload = new URLSearchParams();
+  loginPayload.append('username', username);
+  loginPayload.append('password', password);
+  loginPayload.append('csrfmiddlewaretoken', initialCsrfToken);
+
+  const loginResponse = await fetch(`${url}/loginSystem/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Cookie': `csrftoken=${initialCsrfToken}; cyberpanel_sessionid=${initialSessionId}`,
+      'Referer': `${url}/`,
+    },
+    body: loginPayload.toString(),
+  });
+
+  const loginCookies = loginResponse.headers.get('set-cookie');
+  if (!loginCookies) {
+    throw new Error('Failed to retrieve authenticated cookies from CyberPanel');
+  }
+
+  const authSessionMatch = loginCookies.match(/cyberpanel_sessionid=([^;]+)/);
+  if (!authSessionMatch) {
+    throw new Error('Failed to parse authenticated Session ID');
+  }
+
+  const authSessionId = authSessionMatch[1];
+
+  // 3. Make the Actual API Request
+  const apiPayload = { ...payload };
+
+  const apiResponse = await fetch(`${url}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Cookie': `csrftoken=${initialCsrfToken}; cyberpanel_sessionid=${authSessionId}`,
+      'X-CSRFToken': initialCsrfToken,
+      'Referer': `${url}/`,
+    },
+    body: JSON.stringify(apiPayload),
+  });
+
+  if (!apiResponse.ok) {
+    throw new Error(`CyberPanel API Request failed: ${apiResponse.statusText}`);
+  }
+
+  const responseText = await apiResponse.text();
   try {
-    const { csrfToken, sessionToken } = await getCyberPanelSession(controller);
-    
-    const url = `${CYBERPANEL_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-        "Referer": `${CYBERPANEL_URL}/`,
-        "Origin": CYBERPANEL_URL as string,
-        "Cookie": `csrftoken=${csrfToken}; cyberpanel_sessionid=${sessionToken}`,
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return { success: false, error: "CyberPanel connection failed" };
+    const json = JSON.parse(responseText);
+    // Standardize error handling internally
+    if (json.error_message === "None") {
+      json.error_message = null; 
     }
-
-    const data = await response.json();
-    return { success: true, data };
-    
-  } catch (error: any) {
-    clearTimeout(timeoutId);
-    console.error("[CyberPanel] Network/Fetch Error:", error.message || error);
-    // TEMPORARY: Return exact error for debugging the live server issue
-    return { success: false, error: `CyberPanel connection failed: ${error.message || error}` };
+    return json;
+  } catch (err) {
+    // Return raw text if not JSON
+    return { error_message: null, raw: responseText } as any;
   }
 }
