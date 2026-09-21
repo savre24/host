@@ -81,7 +81,20 @@ export const MENU_ITEMS = [
     key: 'settings',
     label: 'Settings',
     icon: 'tabler:settings',
-    url: '/settings',
+    children: [
+      {
+        key: 'general-settings',
+        label: 'General Settings',
+        url: '/settings',
+        parentKey: 'settings',
+      },
+      {
+        key: 'cyberpanel-servers',
+        label: 'CyberPanel Servers',
+        url: '/settings/cyberpanel',
+        parentKey: 'settings',
+      }
+    ]
   },
 ];
 
