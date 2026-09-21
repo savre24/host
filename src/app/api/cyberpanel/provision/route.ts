@@ -93,10 +93,11 @@ export async function POST(req: Request) {
     // Step 2: Create Website
     const websitePayload = {
       domainName,
-      adminEmail: clientService.client.user.email || 'admin@example.com',
+      ownerEmail: clientService.client.user.email || 'customer@example.com',
       phpSelection: phpVersion,
-      package: packageName,
+      packageName: packageName,
       websiteOwner: customerUsername,
+      ownerPassword: customerPassword,
       openBasedir: 1
     };
 
