@@ -40,12 +40,12 @@ export async function cyberPanelRequest<T = any>(
   const csrfMatch = cookies.match(/csrftoken=([^;]+)/);
   const sessionMatch = cookies.match(/cyberpanel_sessionid=([^;]+)/);
 
-  if (!csrfMatch || !sessionMatch) {
-    throw new Error('Failed to parse CSRF or Session ID from initial response');
+  if (!csrfMatch) {
+    throw new Error('Failed to parse CSRF token from initial response');
   }
 
   const initialCsrfToken = csrfMatch[1];
-  const initialSessionId = sessionMatch[1];
+  const initialSessionId = sessionMatch ? sessionMatch[1] : '';
 
   // 2. Perform Login Request
   const loginPayload = new URLSearchParams();
@@ -53,11 +53,16 @@ export async function cyberPanelRequest<T = any>(
   loginPayload.append('password', password);
   loginPayload.append('csrfmiddlewaretoken', initialCsrfToken);
 
+  const initialCookies = [`csrftoken=${initialCsrfToken}`];
+  if (initialSessionId) {
+    initialCookies.push(`cyberpanel_sessionid=${initialSessionId}`);
+  }
+
   const loginResponse = await fetch(`${url}/loginSystem/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Cookie': `csrftoken=${initialCsrfToken}; cyberpanel_sessionid=${initialSessionId}`,
+      'Cookie': initialCookies.join('; '),
       'Referer': `${url}/`,
     },
     body: loginPayload.toString(),
