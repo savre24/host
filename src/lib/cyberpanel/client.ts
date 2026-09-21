@@ -84,6 +84,7 @@ export async function cyberPanelRequest<T = any>(
   // 3. Make the Actual API Request
   const apiPayload = { 
     adminUser: username,
+    ...(actualApiKey ? {} : { adminPass: password }),
     ...payload 
   };
 
