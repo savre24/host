@@ -2,13 +2,12 @@ import { cyberPanelRequest, CyberPanelServerConfig } from "./client";
 
 /**
  * Verify connectivity and authentication with CyberPanel.
- * We use /websites/fetchWebsitesList as a read-only test endpoint.
+ * We use /api/listPackage as a read-only test endpoint to ensure API Tokens work.
  */
 export async function verifyConnection(server: CyberPanelServerConfig) {
   try {
-    const result = await cyberPanelRequest("/websites/fetchWebsitesList", {
-      page: 1,
-      recordsToShow: 10
+    const result = await cyberPanelRequest("/api/listPackage", {
+      adminUser: server.username
     }, server);
     
     // We expect the CyberPanelResponse to be returned directly by our new client implementation
