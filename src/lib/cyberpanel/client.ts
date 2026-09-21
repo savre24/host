@@ -82,7 +82,10 @@ export async function cyberPanelRequest<T = any>(
   }
 
   // 3. Make the Actual API Request
-  const apiPayload = { ...payload };
+  const apiPayload = { 
+    adminUser: username,
+    ...payload 
+  };
 
   const apiResponse = await fetch(`${url}${endpoint}`, {
     method: 'POST',
