@@ -112,7 +112,7 @@ export async function cyberPanelRequest<T = any>(
   } catch (error: any) {
     clearTimeout(timeoutId);
     console.error("[CyberPanel] Network/Fetch Error:", error.message || error);
-    // Safe generic error handling without exposing stack traces or credentials
-    return { success: false, error: "CyberPanel connection failed" };
+    // TEMPORARY: Return exact error for debugging the live server issue
+    return { success: false, error: `CyberPanel connection failed: ${error.message || error}` };
   }
 }
