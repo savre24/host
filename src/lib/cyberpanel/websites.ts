@@ -7,6 +7,8 @@ export interface WebsiteData {
   ipAddress: string;
   state: string; // e.g. "Active", "Suspended"
   package: string;
+  diskUsed?: string;
+  phpVersion?: string;
 }
 
 export interface CyberPanelResponse<T = any> {
@@ -65,6 +67,8 @@ export async function getWebsites(server: CyberPanelServerConfig): Promise<Cyber
       ipAddress: site.ipAddress,
       state: site.state,
       package: site.package,
+      diskUsed: site.diskUsed,
+      phpVersion: site.phpVersion,
     }));
 
     return { success: true, data: websites };

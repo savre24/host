@@ -9,11 +9,13 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import CyberPanelProductFields from '../CyberPanelProductFields';
 
 const AddProductPage = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(null);
+  const [category, setCategory] = useState('GENERAL');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -62,7 +64,7 @@ const AddProductPage = () => {
                 </Form.Group>
                 <Form.Group as={Col} md="6" controlId="category">
                   <Form.Label>Category</Form.Label>
-                  <Form.Select name="category" defaultValue="GENERAL">
+                  <Form.Select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
                     <option value="GENERAL">General</option>
                     <option value="DOMAIN">Domain</option>
                     <option value="HOSTING">Hosting</option>
@@ -73,6 +75,10 @@ const AddProductPage = () => {
                   </Form.Select>
                 </Form.Group>
               </Row>
+
+              {category === 'HOSTING' && (
+                <CyberPanelProductFields />
+              )}
 
               <Row className="mb-3">
                 <Form.Group as={Col} md="12" controlId="description">

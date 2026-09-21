@@ -62,16 +62,12 @@ model ProductService {
   isRenewable       Boolean      @default(true)
   applyOnlineCharge Boolean      @default(true)
   isActive          Boolean      @default(true)
-  cyberPanelServerId String?
-  cyberPanelPackage  String?
-  cyberPanelPhpVersion String?
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
   clientServices ClientService[]
   QuotationItem  QuotationItem[]
   InvoiceItem    InvoiceItem[]
-  cyberPanelServer CyberPanelServer? @relation(fields: [cyberPanelServerId], references: [id])
 }
 
 enum BillingCycle {
@@ -104,9 +100,8 @@ model ClientService {
 
   renewals          Renewal[]
   supportTickets    SupportTicket[]
-  domainDetail        DomainDetail?
-  radioServerDetail   RadioServerDetail?
-  cyberPanelDetail    CyberPanelHostingDetail?
+  domainDetail      DomainDetail?
+  radioServerDetail RadioServerDetail?
 }
 
 enum ServiceStatus {
@@ -395,26 +390,4 @@ model CyberPanelServer {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  cyberPanelHostingDetails CyberPanelHostingDetail[]
-  productServices          ProductService[]
-}
-
-model CyberPanelHostingDetail {
-  id               String           @id @default(uuid())
-  clientServiceId  String           @unique
-  clientService    ClientService    @relation(fields: [clientServiceId], references: [id], onDelete: Cascade)
-  
-  serverId         String
-  server           CyberPanelServer @relation(fields: [serverId], references: [id])
-  
-  domainName       String
-  username         String           // CyberPanel account username for the client
-  packageName      String           // e.g., "Default"
-  phpVersion       String           // e.g., "PHP 8.1"
-  status           String?          // e.g., "Active", "Suspended"
-  sslEnabled       Boolean          @default(false)
-  
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
 }

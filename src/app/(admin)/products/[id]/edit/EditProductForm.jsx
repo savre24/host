@@ -6,10 +6,13 @@ import { useState, useTransition } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
+import CyberPanelProductFields from '../CyberPanelProductFields';
+
 const EditProductForm = ({ product }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(null);
+  const [category, setCategory] = useState(product.category || 'GENERAL');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ const EditProductForm = ({ product }) => {
         </Form.Group>
         <Form.Group as={Col} md="6" controlId="category">
           <Form.Label>Category</Form.Label>
-          <Form.Select name="category" defaultValue={product.category}>
+          <Form.Select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="GENERAL">General</option>
             <option value="DOMAIN">Domain</option>
             <option value="HOSTING">Hosting</option>
@@ -56,6 +59,14 @@ const EditProductForm = ({ product }) => {
           </Form.Select>
         </Form.Group>
       </Row>
+
+      {category === 'HOSTING' && (
+        <CyberPanelProductFields 
+          defaultServerId={product.cyberPanelServerId} 
+          defaultPackage={product.cyberPanelPackage} 
+          defaultPhpVersion={product.cyberPanelPhpVersion} 
+        />
+      )}
 
       <Row className="mb-3">
         <Form.Group as={Col} md="12" controlId="description">

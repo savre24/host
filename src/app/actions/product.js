@@ -10,7 +10,7 @@ import { sendWhatsAppMessage, fillWhatsAppTemplate } from '@/app/actions/whatsap
  */
 export async function createProduct(formData) {
   try {
-    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive, cyberPanelServerId, cyberPanelPackage, cyberPanelPhpVersion } = formData;
 
     const newProduct = await prisma.productService.create({
       data: {
@@ -23,6 +23,9 @@ export async function createProduct(formData) {
         isRenewable: Boolean(isRenewable),
         applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
         isActive: Boolean(isActive),
+        cyberPanelServerId: cyberPanelServerId || null,
+        cyberPanelPackage: cyberPanelPackage || null,
+        cyberPanelPhpVersion: cyberPanelPhpVersion || null,
       },
     });
 
@@ -39,7 +42,7 @@ export async function createProduct(formData) {
  */
 export async function updateProduct(id, formData) {
   try {
-    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive } = formData;
+    const { name, category, description, defaultPrice, renewalPrice, billingCycle, isRenewable, applyOnlineCharge, isActive, cyberPanelServerId, cyberPanelPackage, cyberPanelPhpVersion } = formData;
 
     const updatedProduct = await prisma.productService.update({
       where: { id },
@@ -53,6 +56,9 @@ export async function updateProduct(id, formData) {
         isRenewable: Boolean(isRenewable),
         applyOnlineCharge: applyOnlineCharge !== undefined ? Boolean(applyOnlineCharge) : true,
         isActive: Boolean(isActive),
+        cyberPanelServerId: cyberPanelServerId || null,
+        cyberPanelPackage: cyberPanelPackage || null,
+        cyberPanelPhpVersion: cyberPanelPhpVersion || null,
       },
     });
 

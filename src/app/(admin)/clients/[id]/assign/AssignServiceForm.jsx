@@ -44,6 +44,34 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
         toast.error(result.error);
       } else {
         toast.success('Service assigned successfully');
+
+        // Automatic CyberPanel Provisioning
+        if (selectedProduct?.category === 'HOSTING' && selectedProduct?.cyberPanelServerId && data.cyberPanelDomain) {
+          toast.info('Provisioning CyberPanel website... Please wait.');
+          try {
+            const cpRes = await fetch('/api/cyberpanel/provision', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clientServiceId: result.data.id,
+                serverId: selectedProduct.cyberPanelServerId,
+                domainName: data.cyberPanelDomain,
+                packageName: selectedProduct.cyberPanelPackage || 'Default',
+                phpVersion: selectedProduct.cyberPanelPhpVersion || 'PHP 8.1',
+                sslEnabled: false // Can be changed later or added as a checkbox
+              })
+            });
+            const cpJson = await cpRes.json();
+            if (cpJson.success) {
+              toast.success('CyberPanel website provisioned successfully!');
+            } else {
+              toast.error(`CyberPanel Provisioning failed: ${cpJson.message}`);
+            }
+          } catch (err) {
+            toast.error('Failed to communicate with provisioning server.');
+          }
+        }
+
         if (result.invoiceId) {
           toast.success('Invoice generated automatically!');
           router.push(`/invoices/${result.invoiceId}`);
@@ -170,6 +198,22 @@ const AssignServiceForm = ({ clientId, clientProfileId, products }) => {
             <Form.Group as={Col} md="6" controlId="radioServerDetails">
               <Form.Label>Radio Server Details</Form.Label>
               <Form.Control as="textarea" rows={6} name="radioServerDetails" placeholder="Stream URL, IP, Port, etc." />
+            </Form.Group>
+          </Row>
+        </div>
+      )}
+
+      {selectedProduct?.category === 'HOSTING' && selectedProduct.cyberPanelServerId && (
+        <div className="border rounded p-3 mb-4 bg-light border-primary">
+          <h5 className="mb-3 text-primary">CyberPanel Hosting Provisioning</h5>
+          <p className="text-muted small mb-3">
+            This product is configured to automatically provision an account on CyberPanel Server <strong>{selectedProduct.cyberPanelServer?.name || selectedProduct.cyberPanelServerId}</strong> using the <strong>{selectedProduct.cyberPanelPackage}</strong> package.
+          </p>
+          <Row className="mb-3">
+            <Form.Group as={Col} md="6" controlId="cyberPanelDomain">
+              <Form.Label>Domain Name *</Form.Label>
+              <Form.Control type="text" name="cyberPanelDomain" placeholder="e.g. example.com" required={true} />
+              <Form.Text className="text-muted">The website domain to create in CyberPanel.</Form.Text>
             </Form.Group>
           </Row>
         </div>
