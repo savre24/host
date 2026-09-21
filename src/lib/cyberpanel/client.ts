@@ -48,24 +48,25 @@ export async function cyberPanelRequest<T = any>(
   const initialSessionId = sessionMatch ? sessionMatch[1] : '';
 
   // 2. Perform Login Request
-  const loginPayload = new URLSearchParams();
-  loginPayload.append('username', username);
-  loginPayload.append('password', password);
-  loginPayload.append('csrfmiddlewaretoken', initialCsrfToken);
+  const loginPayload = {
+    username: username,
+    password: password
+  };
 
   const initialCookies = [`csrftoken=${initialCsrfToken}`];
   if (initialSessionId) {
     initialCookies.push(`cyberpanel_sessionid=${initialSessionId}`);
   }
 
-  const loginResponse = await fetch(`${url}/loginSystem/login`, {
+  const loginResponse = await fetch(`${url}/verifyLogin`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
       'Cookie': initialCookies.join('; '),
+      'X-CSRFToken': initialCsrfToken,
       'Referer': `${url}/`,
     },
-    body: loginPayload.toString(),
+    body: JSON.stringify(loginPayload),
   });
 
   const loginCookies = loginResponse.headers.get('set-cookie');
