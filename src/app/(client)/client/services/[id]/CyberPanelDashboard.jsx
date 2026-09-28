@@ -42,10 +42,10 @@ export default function CyberPanelDashboard({ service }) {
           </div>
 
           {/* Transfer Banner */}
-          <div className="bg-light rounded p-3 d-flex align-items-center justify-content-between mb-4">
-            <div className="d-flex align-items-center">
+          <div className="bg-light rounded p-3 d-flex flex-column flex-md-row align-items-center justify-content-between mb-4">
+            <div className="d-flex align-items-center mb-3 mb-md-0">
               <i className="ri-arrow-left-right-line fs-5 me-2 text-dark"></i>
-              <span className="fw-bold text-dark">Transfer your domain to Hostingspaceindia</span>
+              <span className="fw-bold text-dark text-center text-md-start">Transfer your domain to Hostingspaceindia</span>
             </div>
             <div className="d-flex align-items-center">
               <button className="btn btn-primary rounded-pill px-4 me-3" style={{ backgroundColor: '#6f42c1', borderColor: '#6f42c1' }}>Transfer</button>
@@ -54,12 +54,12 @@ export default function CyberPanelDashboard({ service }) {
           </div>
 
           {/* Bottom Tags Row */}
-          <div className="d-flex flex-wrap align-items-center justify-content-between">
-            <button className="btn btn-outline-secondary rounded-pill btn-sm px-3 fw-bold d-flex align-items-center">
+          <div className="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between">
+            <button className="btn btn-outline-secondary rounded-pill btn-sm px-3 fw-bold d-flex align-items-center mb-3 mb-lg-0">
               <i className="ri-add-line fs-5 me-1"></i> Set up free email
             </button>
             
-            <div className="d-flex gap-2 mt-3 mt-md-0">
+            <div className="d-flex flex-wrap gap-2">
               <span className="badge rounded-pill border text-dark fw-normal px-3 py-2 bg-white d-flex align-items-center">
                 <i className="ri-error-warning-fill text-warning me-2 fs-6"></i> Vulnerabilities detected
               </span>
@@ -103,7 +103,7 @@ export default function CyberPanelDashboard({ service }) {
         </div>
 
         {/* Essentials Grid */}
-        <div className="col-md-6 mb-4">
+        <div className="col-lg-5 col-xl-4 mb-4">
           <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px' }}>
             <div className="card-header bg-white border-bottom-0 pt-4 pb-0">
               <h5 className="fw-bold mb-0">Essentials</h5>
@@ -156,16 +156,16 @@ export default function CyberPanelDashboard({ service }) {
         </div>
 
         {/* Resource Usage & Performance */}
-        <div className="col-md-6 mb-4">
+        <div className="col-lg-7 col-xl-8 mb-4">
           <div className="row h-100">
              {/* Performance */}
              <div className="col-12 mb-4">
                <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px' }}>
-                  <div className="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                  <div className="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 className="fw-bold mb-0">Performance</h5>
                     <button className="btn btn-sm btn-outline-secondary rounded-pill px-3">Run speed test</button>
                   </div>
-                  <div className="card-body d-flex justify-content-around align-items-center">
+                  <div className="card-body d-flex justify-content-around align-items-center flex-wrap gap-4">
                      <div className="text-center">
                         <div className="bg-light rounded-circle d-flex align-items-center justify-content-center border border-dashed mb-2 mx-auto" style={{ width: '70px', height: '70px' }}>
                           <i className="ri-computer-line fs-3 text-muted"></i>
@@ -187,54 +187,58 @@ export default function CyberPanelDashboard({ service }) {
              {/* Resource Usage */}
              <div className="col-12">
                <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px' }}>
-                  <div className="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                  <div className="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 className="fw-bold mb-0">Plan resource usage</h5>
                     <a href={cpUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-secondary rounded-pill px-3">See details</a>
                   </div>
-                  <div className="card-body d-flex align-items-start">
-                    <div className="me-4 position-relative">
+                  <div className="card-body d-flex flex-column flex-md-row align-items-center align-items-md-start">
+                    <div className="mb-4 mb-md-0 me-md-4 position-relative">
                       {/* Simple CSS Donut representation for disk usage (matching 41.31 / 200) */}
                       <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'conic-gradient(#6f42c1 20%, #e9ecef 20%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                          <div style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: 'white' }}></div>
                       </div>
                     </div>
-                    <div className="flex-grow-1 row">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-1">Disk usage</small>
-                          <h6 className="mb-0 fw-bold text-purple" style={{ color: '#6f42c1' }}>41.31 GB <span className="text-muted small fw-normal">/ 200 GB</span></h6>
-                        </div>
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-1">Inodes</small>
-                          <h6 className="mb-0 fw-bold text-success">498.92K <span className="text-muted small fw-normal">/ 2000K</span></h6>
-                        </div>
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-1">Websites</small>
-                          <h6 className="mb-0 fw-bold text-dark">16 <span className="text-muted small fw-normal">/ 300</span></h6>
-                        </div>
-                      </div>
-                      <div className="col-6 border-start ps-3">
-                        <div className="mb-3">
-                          <small className="text-muted d-block mb-1">CPU</small>
-                          <h6 className="mb-2 fw-bold text-dark">2 %</h6>
-                          <div style={{ width: '100%', height: '15px', borderBottom: '1px solid #eee' }} className="d-flex align-items-end overflow-hidden">
-                            <svg viewBox="0 0 100 20" className="w-100 h-100" preserveAspectRatio="none">
-                              <polyline points="0,18 20,17 40,18 50,17 60,18 70,5 80,18 100,18" fill="none" stroke="#6f42c1" strokeWidth="1.5" />
-                            </svg>
+                    <div className="flex-grow-1 w-100">
+                      <div className="row">
+                        <div className="col-sm-6 mb-4 mb-sm-0">
+                          <div className="mb-3">
+                            <small className="text-muted d-block mb-1">Disk usage</small>
+                            <h6 className="mb-0 fw-bold text-purple" style={{ color: '#6f42c1' }}>41.31 GB <span className="text-muted small fw-normal">/ 200 GB</span></h6>
+                          </div>
+                          <div className="mb-3">
+                            <small className="text-muted d-block mb-1">Inodes</small>
+                            <h6 className="mb-0 fw-bold text-success">498.92K <span className="text-muted small fw-normal">/ 2000K</span></h6>
+                          </div>
+                          <div className="mb-3">
+                            <small className="text-muted d-block mb-1">Websites</small>
+                            <h6 className="mb-0 fw-bold text-dark">16 <span className="text-muted small fw-normal">/ 300</span></h6>
                           </div>
                         </div>
-                        <div className="mb-2">
-                          <small className="text-muted d-block mb-1">Memory</small>
-                          <h6 className="mb-2 fw-bold text-dark">531 MB</h6>
-                          <div style={{ width: '100%', height: '15px', borderBottom: '1px solid #eee' }} className="d-flex align-items-end overflow-hidden">
-                            <svg viewBox="0 0 100 20" className="w-100 h-100" preserveAspectRatio="none">
-                              <polyline points="0,15 10,13 20,16 30,14 40,15 50,12 60,14 70,12 80,14 90,12 100,14" fill="none" stroke="#6f42c1" strokeWidth="1.5" />
-                              <polygon points="0,20 0,15 10,13 20,16 30,14 40,15 50,12 60,14 70,12 80,14 90,12 100,14 100,20" fill="#6f42c1" opacity="0.1" />
-                            </svg>
+                        <div className="col-sm-6 d-flex flex-column justify-content-between">
+                          <div className="border-start-sm ps-sm-3 h-100 d-flex flex-column" style={{ borderLeft: '1px solid #dee2e6' }}>
+                            <div className="mb-3">
+                              <small className="text-muted d-block mb-1">CPU</small>
+                              <h6 className="mb-2 fw-bold text-dark">2 %</h6>
+                              <div style={{ width: '100%', height: '15px', borderBottom: '1px solid #eee' }} className="d-flex align-items-end overflow-hidden">
+                                <svg viewBox="0 0 100 20" className="w-100 h-100" preserveAspectRatio="none">
+                                  <polyline points="0,18 20,17 40,18 50,17 60,18 70,5 80,18 100,18" fill="none" stroke="#6f42c1" strokeWidth="1.5" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="mb-2">
+                              <small className="text-muted d-block mb-1">Memory</small>
+                              <h6 className="mb-2 fw-bold text-dark">531 MB</h6>
+                              <div style={{ width: '100%', height: '15px', borderBottom: '1px solid #eee' }} className="d-flex align-items-end overflow-hidden">
+                                <svg viewBox="0 0 100 20" className="w-100 h-100" preserveAspectRatio="none">
+                                  <polyline points="0,15 10,13 20,16 30,14 40,15 50,12 60,14 70,12 80,14 90,12 100,14" fill="none" stroke="#6f42c1" strokeWidth="1.5" />
+                                  <polygon points="0,20 0,15 10,13 20,16 30,14 40,15 50,12 60,14 70,12 80,14 90,12 100,14 100,20" fill="#6f42c1" opacity="0.1" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="mt-auto">
+                              <small className="text-muted d-block mt-3"><i className="ri-information-line"></i> Last 24 hours</small>
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <small className="text-muted d-block mt-3"><i className="ri-information-line"></i> Last 24 hours</small>
                         </div>
                       </div>
                     </div>
