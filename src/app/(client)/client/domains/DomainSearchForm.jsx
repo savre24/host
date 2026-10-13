@@ -141,7 +141,9 @@ export default function DomainSearchForm() {
             <div className="list-group list-group-flush">
               {results.map((item) => {
                 const isAvailable = item.status === 'available';
-                const price = DEFAULT_PRICES[item.tld] || 'Contact for price';
+                const displayPrice = item.sellingPrice 
+                  ? `₹${item.sellingPrice} / year` 
+                  : (DEFAULT_PRICES[item.tld] || 'Contact for price');
 
                 return (
                   <div
@@ -173,9 +175,14 @@ export default function DomainSearchForm() {
                     <div className="d-flex align-items-center gap-3 w-100 w-md-auto justify-content-between justify-content-md-end">
                       <div className="text-end">
                         <div className="fw-bold fs-15 text-primary">
-                          {price}
+                          {displayPrice}
                         </div>
-                        <Badge bg={isAvailable ? 'success' : 'secondary'} className="px-2 py-1">
+                        {isAvailable && item.renewalPrice && (
+                          <div className="text-muted fs-11">
+                            Renews at ₹{item.renewalPrice}/yr
+                          </div>
+                        )}
+                        <Badge bg={isAvailable ? 'success' : 'secondary'} className="px-2 py-1 mt-1">
                           {isAvailable ? 'AVAILABLE' : 'TAKEN'}
                         </Badge>
                       </div>
