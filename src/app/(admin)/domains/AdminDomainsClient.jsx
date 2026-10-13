@@ -174,22 +174,44 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
           <Card className="h-100 border-0 shadow-sm">
             <CardBody className="d-flex align-items-center justify-content-between p-3">
               <div>
-                <span className="text-muted fs-13 text-uppercase fw-semibold">ResellerClub Balance</span>
+                <div className="d-flex align-items-center gap-2">
+                  <span className="text-muted fs-13 text-uppercase fw-semibold">ResellerClub Balance</span>
+                  {wallet && parseFloat(wallet.balance) < 700 && (
+                    <span className="badge bg-warning-subtle text-warning fs-11">Low Funds</span>
+                  )}
+                </div>
                 <h3 className="mb-0 fw-bold mt-1 text-primary">
                   {wallet ? `₹${parseFloat(wallet.balance).toFixed(2)}` : '₹--.--'}
                 </h3>
-                <span className="fs-12 text-muted">Available wallet funds</span>
+                <span className="fs-12 text-muted">
+                  {wallet && parseFloat(wallet.balance) < 700 
+                    ? 'Recharge needed to register/renew domains' 
+                    : 'Available wallet funds'}
+                </span>
               </div>
-              <div className="text-end">
-                <Button 
-                  variant="outline-primary" 
-                  size="sm" 
-                  onClick={fetchWallet} 
-                  disabled={walletLoading}
-                  className="rounded-circle p-2"
-                >
-                  <IconifyIcon icon={walletLoading ? 'tabler:loader' : 'tabler:refresh'} className={walletLoading ? 'spin' : ''} />
-                </Button>
+              <div className="text-end d-flex flex-column align-items-end gap-1">
+                <div className="d-flex gap-1">
+                  <Button 
+                    variant="primary" 
+                    size="sm" 
+                    href="https://manage.resellerclub.com/" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="d-flex align-items-center px-2 py-1 fs-12 fw-medium"
+                  >
+                    <IconifyIcon icon="tabler:plus" className="me-1" /> Add Funds
+                  </Button>
+                  <Button 
+                    variant="outline-secondary" 
+                    size="sm" 
+                    onClick={fetchWallet} 
+                    disabled={walletLoading}
+                    className="p-1 px-2"
+                    title="Refresh Balance"
+                  >
+                    <IconifyIcon icon={walletLoading ? 'tabler:loader' : 'tabler:refresh'} className={walletLoading ? 'spin' : ''} />
+                  </Button>
+                </div>
               </div>
             </CardBody>
           </Card>
