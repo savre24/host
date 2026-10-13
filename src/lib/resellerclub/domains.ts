@@ -194,6 +194,11 @@ export interface TldWholesalePricing {
   registerCost: number;
   renewCost: number;
   transferCost: number;
+  // Inclusive of 18% GST (matching ResellerClub Control Panel)
+  registerCostWithTax: number;
+  renewCostWithTax: number;
+  transferCostWithTax: number;
+  taxRate: number;
   currency: string;
 }
 
@@ -217,17 +222,26 @@ export async function getResellerWholesalePricing(): Promise<Record<string, TldW
     'info': 'dominfo',
   };
 
+  const TAX_RATE = 0.18; // 18% GST for Indian resellers
   const pricing: Record<string, TldWholesalePricing> = {};
 
   for (const [tld, key] of Object.entries(TLD_MAPPING)) {
     const item = data[key];
     if (item) {
+      const reg = parseFloat(item.addnewdomain?.['1'] || '0');
+      const ren = parseFloat(item.renewdomain?.['1'] || '0');
+      const trn = parseFloat(item.addtransferdomain?.['1'] || '0');
+
       pricing[tld] = {
         tld,
         productKey: key,
-        registerCost: parseFloat(item.addnewdomain?.['1'] || '0'),
-        renewCost: parseFloat(item.renewdomain?.['1'] || '0'),
-        transferCost: parseFloat(item.addtransferdomain?.['1'] || '0'),
+        registerCost: reg,
+        renewCost: ren,
+        transferCost: trn,
+        registerCostWithTax: parseFloat((reg * (1 + TAX_RATE)).toFixed(2)),
+        renewCostWithTax: parseFloat((ren * (1 + TAX_RATE)).toFixed(2)),
+        transferCostWithTax: parseFloat((trn * (1 + TAX_RATE)).toFixed(2)),
+        taxRate: 18,
         currency: 'INR',
       };
     }

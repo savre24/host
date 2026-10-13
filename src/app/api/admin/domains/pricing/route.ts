@@ -54,21 +54,28 @@ export async function GET() {
       const sellingPrice = matchedDb?.defaultPrice ?? cfg.defaultPrice;
       const renewalPrice = matchedDb?.renewalPrice ?? cfg.renewalPrice;
 
+      const wholesaleRegisterBase = wholesale?.registerCost ?? null;
+      const wholesaleRenewBase = wholesale?.renewCost ?? null;
+      const wholesaleRegisterWithTax = wholesale?.registerCostWithTax ?? (wholesaleRegisterBase ? parseFloat((wholesaleRegisterBase * 1.18).toFixed(2)) : null);
+      const wholesaleRenewWithTax = wholesale?.renewCostWithTax ?? (wholesaleRenewBase ? parseFloat((wholesaleRenewBase * 1.18).toFixed(2)) : null);
+
       return {
         tld: cfg.tld,
         productId: matchedDb?.id || null,
         name: matchedDb?.name || cfg.name,
-        // Live ResellerClub wholesale cost
-        wholesaleRegister: wholesale?.registerCost ?? null,
-        wholesaleRenew: wholesale?.renewCost ?? null,
-        wholesaleTransfer: wholesale?.transferCost ?? null,
+        // Live ResellerClub wholesale cost (Base & With 18% GST)
+        wholesaleRegister: wholesaleRegisterBase,
+        wholesaleRenew: wholesaleRenewBase,
+        wholesaleRegisterWithTax,
+        wholesaleRenewWithTax,
+        taxRate: 18,
         currency: 'INR',
         // Admin configured prices
         sellingPrice,
         renewalPrice,
-        // Calculated profit margins
-        registerProfit: wholesale?.registerCost ? sellingPrice - wholesale.registerCost : null,
-        renewalProfit: wholesale?.renewCost ? renewalPrice - wholesale.renewCost : null,
+        // Calculated profit margins (after 18% GST deduction)
+        registerProfit: wholesaleRegisterWithTax ? parseFloat((sellingPrice - wholesaleRegisterWithTax).toFixed(2)) : null,
+        renewalProfit: wholesaleRenewWithTax ? parseFloat((renewalPrice - wholesaleRenewWithTax).toFixed(2)) : null,
       };
     });
 

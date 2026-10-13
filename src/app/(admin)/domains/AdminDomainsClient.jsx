@@ -318,57 +318,66 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                       <thead className="table-light">
                         <tr>
                           <th>Extension</th>
-                          <th>ResellerClub Wholesale (Reg / Renew)</th>
+                          <th>ResellerClub Cost (Incl. 18% GST)</th>
                           <th style={{ width: '180px' }}>Your Selling Price (₹)</th>
                           <th style={{ width: '180px' }}>Your Renewal Price (₹)</th>
-                          <th>Expected Margin (Reg / Renew)</th>
+                          <th>Net Profit Margin</th>
                           <th className="text-center">Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {pricing.map((item) => (
-                          <tr key={item.tld}>
-                            <td>
-                              <span className="badge bg-primary fs-14 px-2 py-1">.{item.tld}</span>
-                              <div className="fs-12 text-muted mt-1">{item.name}</div>
-                            </td>
-                            <td>
-                              <div className="fw-semibold text-danger">
-                                Reg: ₹{item.wholesaleRegister ? item.wholesaleRegister.toFixed(2) : '--'}
-                              </div>
-                              <div className="fw-semibold text-danger fs-12">
-                                Renew: ₹{item.wholesaleRenew ? item.wholesaleRenew.toFixed(2) : '--'}
-                              </div>
-                            </td>
-                            <td>
-                              <InputGroup size="sm">
-                                <InputGroup.Text>₹</InputGroup.Text>
-                                <Form.Control
-                                  type="number"
-                                  value={item.sellingPrice}
-                                  onChange={(e) => handlePriceChange(item.tld, 'sellingPrice', e.target.value)}
-                                />
-                              </InputGroup>
-                            </td>
-                            <td>
-                              <InputGroup size="sm">
-                                <InputGroup.Text>₹</InputGroup.Text>
-                                <Form.Control
-                                  type="number"
-                                  value={item.renewalPrice}
-                                  onChange={(e) => handlePriceChange(item.tld, 'renewalPrice', e.target.value)}
-                                  className="border-primary"
-                                />
-                              </InputGroup>
-                            </td>
-                            <td>
-                              <div className="fw-semibold text-success">
-                                Reg: +₹{item.registerProfit !== null ? item.registerProfit.toFixed(2) : '--'}
-                              </div>
-                              <div className="fw-semibold text-success fs-12">
-                                Renew: +₹{item.renewalProfit !== null ? item.renewalProfit.toFixed(2) : '--'}
-                              </div>
-                            </td>
+                        {pricing.map((item) => {
+                          const regCost = item.wholesaleRegisterWithTax || (item.wholesaleRegister ? parseFloat((item.wholesaleRegister * 1.18).toFixed(2)) : null);
+                          const renCost = item.wholesaleRenewWithTax || (item.wholesaleRenew ? parseFloat((item.wholesaleRenew * 1.18).toFixed(2)) : null);
+                          const regProfit = regCost !== null ? parseFloat((item.sellingPrice - regCost).toFixed(2)) : null;
+                          const renProfit = renCost !== null ? parseFloat((item.renewalPrice - renCost).toFixed(2)) : null;
+
+                          return (
+                            <tr key={item.tld}>
+                              <td>
+                                <span className="badge bg-primary fs-14 px-2 py-1">.{item.tld}</span>
+                                <div className="fs-12 text-muted mt-1">{item.name}</div>
+                              </td>
+                              <td>
+                                <div className="fw-semibold text-danger">
+                                  Reg: ₹{regCost ? regCost.toFixed(2) : '--'}
+                                </div>
+                                <div className="fw-semibold text-danger fs-12">
+                                  Renew: ₹{renCost ? renCost.toFixed(2) : '--'}
+                                </div>
+                                <div className="text-muted fs-11 mt-1">
+                                  Base: ₹{item.wholesaleRegister?.toFixed(2)} + 18% GST
+                                </div>
+                              </td>
+                              <td>
+                                <InputGroup size="sm">
+                                  <InputGroup.Text>₹</InputGroup.Text>
+                                  <Form.Control
+                                    type="number"
+                                    value={item.sellingPrice}
+                                    onChange={(e) => handlePriceChange(item.tld, 'sellingPrice', e.target.value)}
+                                  />
+                                </InputGroup>
+                              </td>
+                              <td>
+                                <InputGroup size="sm">
+                                  <InputGroup.Text>₹</InputGroup.Text>
+                                  <Form.Control
+                                    type="number"
+                                    value={item.renewalPrice}
+                                    onChange={(e) => handlePriceChange(item.tld, 'renewalPrice', e.target.value)}
+                                    className="border-primary"
+                                  />
+                                </InputGroup>
+                              </td>
+                              <td>
+                                <div className="fw-semibold text-success">
+                                  Reg: {regProfit !== null ? (regProfit >= 0 ? `+₹${regProfit.toFixed(2)}` : `-₹${Math.abs(regProfit).toFixed(2)}`) : '--'}
+                                </div>
+                                <div className="fw-semibold text-success fs-12">
+                                  Renew: {renProfit !== null ? (renProfit >= 0 ? `+₹${renProfit.toFixed(2)}` : `-₹${Math.abs(renProfit).toFixed(2)}`) : '--'}
+                                </div>
+                              </td>
                             <td className="text-center">
                               <Button
                                 variant="primary"
@@ -427,7 +436,7 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                         <tr>
                           <th>Domain Name</th>
                           <th>Status</th>
-                          <th>Wholesale Cost</th>
+                          <th>Wholesale Cost (Incl. 18% GST)</th>
                           <th>Selling Price</th>
                           <th>Renewal Price</th>
                           <th>Action</th>
@@ -436,6 +445,7 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                       <tbody>
                         {searchResults.map((r) => {
                           const isAvail = r.status === 'available';
+                          const wholesaleWithTax = r.wholesaleRegister ? (r.wholesaleRegister * 1.18).toFixed(2) : null;
                           return (
                             <tr key={r.domain}>
                               <td className="fw-bold fs-15">{r.domain}</td>
@@ -445,7 +455,8 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                                 </Badge>
                               </td>
                               <td className="text-danger fw-semibold">
-                                ₹{r.wholesaleRegister ? r.wholesaleRegister.toFixed(2) : '--'}
+                                {wholesaleWithTax ? `₹${wholesaleWithTax}` : '--'}
+                                <div className="text-muted fs-11">Base: ₹{r.wholesaleRegister?.toFixed(2)} + GST</div>
                               </td>
                               <td className="text-primary fw-semibold">
                                 ₹{r.sellingPrice ? r.sellingPrice.toFixed(2) : '--'}

@@ -20,12 +20,12 @@ export default function ResellerClubDomainManageCard({ service }) {
   const tld = parts.length > 1 ? parts.slice(1).join('.').toLowerCase() : 'com';
 
   const wholesaleMap = {
-    'com': 1179,
-    'in': 789,
-    'co.in': 699,
-    'net': 1679,
-    'org': 1619,
-    'online': 3309,
+    'com': 1391.22, // ₹1,179 + 18% GST
+    'in': 931.02,   // ₹789 + 18% GST
+    'co.in': 824.82,// ₹699 + 18% GST
+    'net': 1981.22, // ₹1,679 + 18% GST
+    'org': 1910.42, // ₹1,619 + 18% GST
+    'online': 3904.62, // ₹3,309 + 18% GST
   };
   const wholesaleCost = wholesaleMap[tld] || null;
   const clientRenewalPrice = service.renewalPrice || service.product?.renewalPrice || 0;
