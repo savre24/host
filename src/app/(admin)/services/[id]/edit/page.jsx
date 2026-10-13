@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { Col, Row } from 'react-bootstrap';
 import EditClientServiceForm from './EditClientServiceForm';
 import CyberPanelProvisionForm from './CyberPanelProvisionForm';
+import ResellerClubDomainManageCard from './ResellerClubDomainManageCard';
 
 export const metadata = {
   title: 'Edit Assigned Service',
@@ -40,6 +41,9 @@ const EditClientServicePage = async ({ params }) => {
         <Col lg={8} className="mx-auto">
           {/* CyberPanel Provisioning Section */}
           <CyberPanelProvisionForm service={service} />
+          
+          {/* ResellerClub Domain Management Section */}
+          <ResellerClubDomainManageCard service={service} />
           
           <ComponentContainerCard title="Update Service Details">
             <EditClientServiceForm service={service} />

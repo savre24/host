@@ -29,6 +29,12 @@ export const MENU_ITEMS = [
     url: '/services',
   },
   {
+    key: 'domains',
+    label: 'Domains',
+    icon: 'tabler:world',
+    url: '/domains',
+  },
+  {
     key: 'renewals',
     label: 'Renewals',
     icon: 'tabler:repeat',
@@ -110,6 +116,12 @@ export const HORIZONTAL_MENU_ITEM = [
     label: 'My Services',
     icon: 'tabler:briefcase',
     url: '/client/services',
+  },
+  {
+    key: 'register-domain',
+    label: 'Domains',
+    icon: 'tabler:world',
+    url: '/client/domains',
   },
   {
     key: 'renewals',
