@@ -23,7 +23,9 @@ export default function ResellerClubDomainManageCard({ service }) {
     'com': 1179,
     'in': 789,
     'co.in': 699,
+    'net': 1679,
     'org': 1619,
+    'online': 3309,
   };
   const wholesaleCost = wholesaleMap[tld] || null;
   const clientRenewalPrice = service.renewalPrice || service.product?.renewalPrice || 0;

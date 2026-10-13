@@ -210,7 +210,11 @@ export async function getResellerWholesalePricing(): Promise<Record<string, TldW
     'com': 'domcno',
     'in': 'dotin',
     'co.in': 'thirdleveldotin',
+    'net': 'dotnet',
     'org': 'domorg',
+    'online': 'dotonline',
+    'biz': 'dombiz',
+    'info': 'dominfo',
   };
 
   const pricing: Record<string, TldWholesalePricing> = {};

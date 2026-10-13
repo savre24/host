@@ -240,7 +240,7 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
               <div>
                 <span className="text-muted fs-13 text-uppercase fw-semibold">Supported TLDs</span>
                 <h4 className="mb-0 fw-bold mt-1 text-body">
-                  .com, .in, .co.in, .org
+                  .com, .in, .co.in, .net, .org, .online
                 </h4>
                 <span className="fs-12 text-muted">Ready for live registration & renewal</span>
               </div>

@@ -5,10 +5,12 @@ import prisma from '@/lib/prisma';
 import { getResellerWholesalePricing } from '@/lib/resellerclub/domains';
 
 const DEFAULT_TLD_CONFIG = [
-  { tld: 'com', name: '.com Domain Registration', defaultPrice: 1299, renewalPrice: 1399 },
-  { tld: 'in', name: '.in Domain Registration', defaultPrice: 899, renewalPrice: 999 },
-  { tld: 'co.in', name: '.co.in Domain Registration', defaultPrice: 799, renewalPrice: 899 },
-  { tld: 'org', name: '.org Domain Registration', defaultPrice: 1599, renewalPrice: 1799 },
+  { tld: 'com', name: '.com Domain Registration', defaultPrice: 1850, renewalPrice: 1780 },
+  { tld: 'in', name: '.in Domain Registration', defaultPrice: 899, renewalPrice: 899 },
+  { tld: 'co.in', name: '.co.in Domain Registration', defaultPrice: 899, renewalPrice: 899 },
+  { tld: 'net', name: '.net Domain Registration', defaultPrice: 1499, renewalPrice: 1799 },
+  { tld: 'org', name: '.org Domain Registration', defaultPrice: 1650, renewalPrice: 2280 },
+  { tld: 'online', name: '.online Domain Registration', defaultPrice: 499, renewalPrice: 3499 },
 ];
 
 export async function GET() {
@@ -41,10 +43,13 @@ export async function GET() {
     // 3. Combine wholesale costs with admin retail & renewal prices
     const combined = DEFAULT_TLD_CONFIG.map((cfg) => {
       const wholesale = wholesalePricing[cfg.tld] || null;
-      const matchedDb = dbProducts.find((p) => 
-        p.name.toLowerCase().includes(`.${cfg.tld}`) || 
-        p.description?.toLowerCase().includes(`.${cfg.tld}`)
-      );
+      const matchedDb = dbProducts.find((p) => {
+        const name = p.name.toLowerCase();
+        if (cfg.tld === 'in') {
+          return name.includes('.in') && !name.includes('.co.in');
+        }
+        return name.includes(`.${cfg.tld}`) || p.description?.toLowerCase().includes(`.${cfg.tld}`);
+      });
 
       const sellingPrice = matchedDb?.defaultPrice ?? cfg.defaultPrice;
       const renewalPrice = matchedDb?.renewalPrice ?? cfg.renewalPrice;
@@ -105,12 +110,23 @@ export async function POST(req: NextRequest) {
     const productName = `.${tldConfig.tld} Domain Registration`;
 
     // Upsert or update product in database
-    const existing = await prisma.productService.findFirst({
-      where: {
-        category: 'DOMAIN',
-        name: { contains: `.${tldConfig.tld}` },
-      },
-    });
+    let existing;
+    if (tldConfig.tld === 'in') {
+      const allIn = await prisma.productService.findMany({
+        where: {
+          category: 'DOMAIN',
+          name: { contains: '.in' },
+        },
+      });
+      existing = allIn.find(p => !p.name.toLowerCase().includes('.co.in'));
+    } else {
+      existing = await prisma.productService.findFirst({
+        where: {
+          category: 'DOMAIN',
+          name: { contains: `.${tldConfig.tld}` },
+        },
+      });
+    }
 
     let savedProduct;
     if (existing) {

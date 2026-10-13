@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'domain query parameter is required' }, { status: 400 });
     }
 
-    const targetTlds = ['com', 'in', 'co.in', 'org'];
+    const targetTlds = ['com', 'in', 'co.in', 'net', 'org', 'online'];
 
     // 1. Check availability
     const [availability, wholesalePrices, dbProducts] = await Promise.all([
@@ -32,15 +32,21 @@ export async function GET(req: NextRequest) {
 
     const results = availability.map((item) => {
       const wholesale = (wholesalePrices as any)[item.tld];
-      const matchedDb = (dbProducts as any[]).find(p => 
-        p.name.toLowerCase().includes(`.${item.tld}`)
-      );
+      const matchedDb = (dbProducts as any[]).find(p => {
+        const name = p.name.toLowerCase();
+        if (item.tld === 'in') {
+          return name.includes('.in') && !name.includes('.co.in');
+        }
+        return name.includes(`.${item.tld}`);
+      });
 
       const defaultSelling = {
-        'com': { sell: 1299, renew: 1399 },
-        'in': { sell: 899, renew: 999 },
-        'co.in': { sell: 799, renew: 899 },
-        'org': { sell: 1599, renew: 1799 },
+        'com': { sell: 1850, renew: 1780 },
+        'in': { sell: 899, renew: 899 },
+        'co.in': { sell: 899, renew: 899 },
+        'net': { sell: 1499, renew: 1799 },
+        'org': { sell: 1650, renew: 2280 },
+        'online': { sell: 499, renew: 3499 },
       }[item.tld] || { sell: 999, renew: 999 };
 
       const sellingPrice = matchedDb?.defaultPrice ?? defaultSelling.sell;
