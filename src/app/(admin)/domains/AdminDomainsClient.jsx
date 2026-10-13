@@ -390,7 +390,8 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                               </Button>
                             </td>
                           </tr>
-                        ))}
+                        );
+                      })}
                       </tbody>
                     </Table>
                   </div>
