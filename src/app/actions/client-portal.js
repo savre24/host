@@ -18,9 +18,29 @@ export async function getClientDashboardStats(userId) {
     const profile = await getClientProfileByUserId(userId);
     if (!profile) return { error: 'Client profile not found' };
 
-    const activeServices = await prisma.clientService.count({
-      where: { clientId: profile.id, status: 'ACTIVE' }
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const allServices = await prisma.clientService.findMany({
+      where: { clientId: profile.id },
+      include: { product: true },
+      orderBy: { expiryDate: 'asc' }
     });
+
+    // Exclude any service that was ordered online but its invoice is NOT paid
+    const validServices = [];
+    for (const service of allServices) {
+      if (service.notes && service.notes.includes('Domain ordered online by client (Invoice #')) {
+        const match = service.notes.match(/Invoice #(INV-[^)]+)/);
+        if (match) {
+          const inv = await prisma.invoice.findUnique({ where: { invoiceNumber: match[1] } });
+          if (!inv || inv.status !== 'PAID') continue;
+        }
+      }
+      validServices.push(service);
+    }
+
+    const activeServices = validServices.filter(s => s.status === 'ACTIVE').length;
 
     const pendingInvoicesData = await prisma.invoice.findMany({
       where: { clientId: profile.id, status: { in: ['PENDING', 'PARTIALLY_PAID', 'OVERDUE'] } },
@@ -37,9 +57,6 @@ export async function getClientDashboardStats(userId) {
       where: { clientId: userId, status: 'OPEN' }
     });
 
-    const thirtyDaysFromNow = new Date();
-    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-
     const latestInvoice = await prisma.invoice.findFirst({
       where: { clientId: profile.id, status: { not: 'DRAFT' } },
       orderBy: { invoiceDate: 'desc' },
@@ -53,16 +70,10 @@ export async function getClientDashboardStats(userId) {
       take: 5
     });
 
-    const upcomingRenewals = await prisma.clientService.findMany({
-      where: { 
-        clientId: profile.id, 
-        status: { in: ['ACTIVE', 'EXPIRING_SOON'] },
-        expiryDate: { lte: thirtyDaysFromNow, not: null }
-      },
-      include: { product: true },
-      orderBy: { expiryDate: 'asc' },
-      take: 5
-    });
+    const upcomingRenewals = validServices.filter(s => 
+      ['ACTIVE', 'EXPIRING_SOON'].includes(s.status) &&
+      s.expiryDate && new Date(s.expiryDate) <= thirtyDaysFromNow
+    ).slice(0, 5);
 
     return {
       success: true,
@@ -92,7 +103,24 @@ export async function getClientServices(userId) {
       orderBy: { startDate: 'desc' }
     });
 
-    return { success: true, data: services };
+    // Exclude any service that was ordered online but its invoice is NOT paid
+    const visibleServices = [];
+    for (const service of services) {
+      if (service.notes && service.notes.includes('Domain ordered online by client (Invoice #')) {
+        const match = service.notes.match(/Invoice #(INV-[^)]+)/);
+        if (match) {
+          const inv = await prisma.invoice.findUnique({
+            where: { invoiceNumber: match[1] }
+          });
+          if (!inv || inv.status !== 'PAID') {
+            continue;
+          }
+        }
+      }
+      visibleServices.push(service);
+    }
+
+    return { success: true, data: visibleServices };
   } catch (error) {
     return { error: 'Failed to fetch services' };
   }

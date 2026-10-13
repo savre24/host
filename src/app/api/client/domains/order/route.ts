@@ -117,41 +117,18 @@ export async function POST(req: NextRequest) {
     const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
     const invoiceNumber = `INV-${new Date().getFullYear()}-${randomStr}`;
 
-    // 6. Persist ClientService & Invoice in database
     const nsString = Array.isArray(nameservers) && nameservers.length > 0 
       ? nameservers.filter(Boolean).join(', ') 
       : 'ns1.hostingspaceindia.com, ns2.hostingspaceindia.com';
 
-    // Create ClientService
-    const clientService = await prisma.clientService.create({
-      data: {
-        clientId: profile.id,
-        productId: product?.id || (await getOrCreateDefaultDomainProduct(tld)),
-        customName: cleanDomain,
-        price: unitPrice,
-        renewalPrice: renewalPrice,
-        billingCycle: 'YEARLY',
-        startDate: new Date(),
-        expiryDate: new Date(Date.now() + durationYears * 365 * 24 * 60 * 60 * 1000),
-        status: 'ACTIVE',
-        notes: `Domain ordered online by client (Invoice #${invoiceNumber}). Nameservers: ${nsString}`,
-        domainDetail: {
-          create: {
-            dnsNameservers: nsString,
-            domainOwnership: 'Client',
-          },
-        },
-      },
-    });
-
-    // Create Invoice with item
+    // 6. Create Invoice with item (Service is only created after payment is successful)
     const newInvoice = await prisma.invoice.create({
       data: {
         clientId: profile.id,
         invoiceNumber,
         invoiceDate: new Date(),
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // Due in 3 days
-        notes: `Domain Registration for ${cleanDomain} (${durationYears} Year${durationYears > 1 ? 's' : ''})`,
+        notes: `Domain Registration: ${cleanDomain} (${durationYears} Year${durationYears > 1 ? 's' : ''}) | Nameservers: ${nsString} | Renewal: ₹${renewalPrice}`,
         subtotal,
         discount: 0,
         taxAmount,
@@ -178,7 +155,6 @@ export async function POST(req: NextRequest) {
       message: `Invoice #${invoiceNumber} generated successfully.`,
       invoiceId: newInvoice.id,
       invoiceNumber: newInvoice.invoiceNumber,
-      serviceId: clientService.id,
       domain: cleanDomain,
       total: newInvoice.total,
       redirectUrl: `/client/payments/pay/${newInvoice.id}`,

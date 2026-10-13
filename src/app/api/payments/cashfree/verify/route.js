@@ -75,6 +75,7 @@ export async function POST(req) {
                     customName: domainName
                   }
                 });
+
                 if (service) {
                   domainServiceId = service.id;
                   await tx.clientService.update({
@@ -84,6 +85,36 @@ export async function POST(req) {
                       notes: `${service.notes || ''} | Paid via Cashfree (${orderId}). Active.`
                     }
                   });
+                } else {
+                  // Service does not exist yet; create it now upon successful payment!
+                  let nsString = 'ns1.hostingspaceindia.com, ns2.hostingspaceindia.com';
+                  const nsMatch = invoice.notes?.match(/Nameservers:\s*([^|]+)/i);
+                  if (nsMatch && nsMatch[1].trim()) {
+                    nsString = nsMatch[1].trim();
+                  }
+
+                  const durationYears = domainItem.quantity || 1;
+                  const newService = await tx.clientService.create({
+                    data: {
+                      clientId: invoice.clientId,
+                      productId: domainItem.productId,
+                      customName: domainName,
+                      price: domainItem.unitPrice,
+                      renewalPrice: domainItem.unitPrice,
+                      billingCycle: 'YEARLY',
+                      startDate: new Date(),
+                      expiryDate: new Date(Date.now() + durationYears * 365 * 24 * 60 * 60 * 1000),
+                      status: 'ACTIVE',
+                      notes: `Paid online via Cashfree (${orderId}, Invoice #${invoice.invoiceNumber}). Active.`,
+                      domainDetail: {
+                        create: {
+                          dnsNameservers: nsString,
+                          domainOwnership: 'Client'
+                        }
+                      }
+                    }
+                  });
+                  domainServiceId = newService.id;
                 }
               }
             }

@@ -306,8 +306,53 @@ export async function recordPayment(invoiceId, formData) {
               status: 'ACTIVE'
             }
           });
-          
-          // Mark Renewal as fulfilled/archived? We can just keep it or update status if we had one.
+        }
+      }
+
+      // Domain Registration Provisioning: If invoice is for domain registration, provision service now that it's paid
+      const domainItem = invoice.items?.find(it => it.description?.toLowerCase().includes('domain registration'));
+      if (domainItem) {
+        const match = domainItem.description.match(/Domain Registration:\s*([^\s(]+)/i);
+        const domainName = match ? match[1].toLowerCase().trim() : null;
+        if (domainName) {
+          const existing = await prisma.clientService.findFirst({
+            where: { clientId: invoice.clientId, customName: domainName }
+          });
+          if (!existing) {
+            let nsString = 'ns1.hostingspaceindia.com, ns2.hostingspaceindia.com';
+            const nsMatch = invoice.notes?.match(/Nameservers:\s*([^|]+)/i);
+            if (nsMatch && nsMatch[1].trim()) nsString = nsMatch[1].trim();
+
+            const durationYears = domainItem.quantity || 1;
+            await prisma.clientService.create({
+              data: {
+                clientId: invoice.clientId,
+                productId: domainItem.productId,
+                customName: domainName,
+                price: domainItem.unitPrice,
+                renewalPrice: domainItem.unitPrice,
+                billingCycle: 'YEARLY',
+                startDate: new Date(),
+                expiryDate: new Date(Date.now() + durationYears * 365 * 24 * 60 * 60 * 1000),
+                status: 'ACTIVE',
+                notes: `Paid (Invoice #${invoice.invoiceNumber}). Active.`,
+                domainDetail: {
+                  create: {
+                    dnsNameservers: nsString,
+                    domainOwnership: 'Client'
+                  }
+                }
+              }
+            });
+          } else {
+            await prisma.clientService.update({
+              where: { id: existing.id },
+              data: {
+                status: 'ACTIVE',
+                notes: `${existing.notes || ''} | Paid (Invoice #${invoice.invoiceNumber}). Active.`
+              }
+            });
+          }
         }
       }
     } else if (invoice.status === 'DRAFT') {

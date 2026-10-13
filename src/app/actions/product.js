@@ -342,6 +342,18 @@ export async function getClientServiceById(id) {
       }
     });
     if (!service) return { error: 'Client service not found' };
+
+    // If ordered online but invoice has not been paid yet, do not display as active service
+    if (service.notes && service.notes.includes('Domain ordered online by client (Invoice #')) {
+      const match = service.notes.match(/Invoice #(INV-[^)]+)/);
+      if (match) {
+        const inv = await prisma.invoice.findUnique({ where: { invoiceNumber: match[1] } });
+        if (!inv || inv.status !== 'PAID') {
+          return { error: 'This domain service is awaiting payment and will be activated once the invoice is paid.' };
+        }
+      }
+    }
+
     return { success: true, data: service };
   } catch (error) {
     console.error('Error fetching client service:', error);
