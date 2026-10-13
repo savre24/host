@@ -38,7 +38,13 @@ export async function POST(req) {
         await prisma.$transaction(async (tx) => {
           // Check if invoice exists and is not already paid
           const invoice = await tx.invoice.findUnique({
-            where: { id: invoiceId }
+            where: { id: invoiceId },
+            include: {
+              items: true,
+              client: {
+                include: { user: true }
+              }
+            }
           });
 
           if (invoice && invoice.status !== 'PAID') {
@@ -54,6 +60,34 @@ export async function POST(req) {
               data: { status: 'PAID' }
             });
             
+            // Check for Domain Registration item
+            const domainItem = invoice.items?.find(it => it.description?.toLowerCase().includes('domain registration'));
+            let domainServiceId = null;
+            let domainName = null;
+
+            if (domainItem) {
+              const match = domainItem.description.match(/Domain Registration:\s*([^\s(]+)/i);
+              domainName = match ? match[1].toLowerCase().trim() : null;
+              if (domainName) {
+                const service = await tx.clientService.findFirst({
+                  where: {
+                    clientId: invoice.clientId,
+                    customName: domainName
+                  }
+                });
+                if (service) {
+                  domainServiceId = service.id;
+                  await tx.clientService.update({
+                    where: { id: service.id },
+                    data: {
+                      status: 'ACTIVE',
+                      notes: `${service.notes || ''} | Paid via Cashfree (${orderId}). Active.`
+                    }
+                  });
+                }
+              }
+            }
+
             // Create a Payment Record
             await tx.payment.create({
               data: {
@@ -76,6 +110,46 @@ export async function POST(req) {
             });
           }
         });
+
+        // Background / Async Domain Provisioning Attempt
+        try {
+          const freshInvoice = await prisma.invoice.findUnique({
+            where: { id: invoiceId },
+            include: { items: true, client: { include: { user: true } } }
+          });
+          const domainItem = freshInvoice?.items?.find(it => it.description?.toLowerCase().includes('domain registration'));
+          if (domainItem) {
+            const match = domainItem.description.match(/Domain Registration:\s*([^\s(]+)/i);
+            const domainName = match ? match[1].toLowerCase().trim() : null;
+            if (domainName && freshInvoice.client) {
+              const { executeLiveDomainRegistration } = await import('@/lib/resellerclub/domains');
+              const regResult = await executeLiveDomainRegistration({
+                domainName,
+                years: domainItem.quantity || 1,
+                clientProfile: freshInvoice.client
+              });
+
+              if (regResult.success) {
+                await prisma.clientService.updateMany({
+                  where: { clientId: freshInvoice.clientId, customName: domainName },
+                  data: {
+                    notes: `Successfully registered via ResellerClub (Order #${regResult.orderId})`
+                  }
+                });
+              } else {
+                console.warn(`ResellerClub auto-registration deferred for ${domainName}:`, regResult.error);
+                await prisma.clientService.updateMany({
+                  where: { clientId: freshInvoice.clientId, customName: domainName },
+                  data: {
+                    notes: `Payment received. Pending ResellerClub API registration: ${regResult.error}. Admin can 1-click retry from Admin Domains panel.`
+                  }
+                });
+              }
+            }
+          }
+        } catch (provErr) {
+          console.error('Error during automatic domain registration attempt:', provErr);
+        }
 
         return NextResponse.json({ success: true, status: 'PAID' });
       } else {

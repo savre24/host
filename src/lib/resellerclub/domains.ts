@@ -250,3 +250,123 @@ export async function getResellerWholesalePricing(): Promise<Record<string, TldW
   return pricing;
 }
 
+/**
+ * Ensures a ResellerClub customer and default contact exist for a ClientProfile
+ */
+export async function getOrCreateResellerCustomer(clientProfile: any): Promise<{ customerId: number; contactId: number }> {
+  const email = clientProfile.user?.email || `client-${clientProfile.id}@hostingspaceindia.com`;
+  const name = clientProfile.user?.name || clientProfile.companyName || 'Valued Client';
+  const company = clientProfile.companyName || name;
+  const rawPhone = clientProfile.phone ? String(clientProfile.phone).replace(/[^0-9]/g, '') : '9876543210';
+  const phone = rawPhone.length >= 10 ? rawPhone.slice(-10) : '9876543210';
+  const phoneCc = '91';
+  const address = clientProfile.address || 'Hosting Space India Main Road';
+  const city = 'Chennai';
+  const state = 'Tamil Nadu';
+  const country = 'IN';
+  const zipcode = '600001';
+
+  let customerId: number | null = null;
+  try {
+    const details = await resellerClubRequest<any>(
+      '/customers/details.json',
+      'GET',
+      { username: email }
+    );
+    if (details && (details['customerid'] || details.customerid)) {
+      customerId = Number(details['customerid'] || details.customerid);
+    }
+  } catch (e) {
+    // Not found, will signup
+  }
+
+  if (!customerId) {
+    const randomPassword = 'Cust' + Math.random().toString(36).substring(2, 8) + '!9A';
+    customerId = await createResellerCustomer({
+      username: email,
+      passwd: randomPassword,
+      name,
+      company,
+      address1: address,
+      city,
+      state,
+      country,
+      zipcode,
+      phoneCc,
+      phone,
+    });
+  }
+
+  // Get or create default contact
+  let contactId: number | null = null;
+  try {
+    const defaultContact = await resellerClubRequest<any>(
+      '/contacts/default.json',
+      'GET',
+      { 'customer-id': String(customerId), type: 'Contact' }
+    );
+    if (defaultContact && (defaultContact['contactid'] || defaultContact.contactid)) {
+      contactId = Number(defaultContact['contactid'] || defaultContact.contactid);
+    }
+  } catch (e) {
+    // create contact
+  }
+
+  if (!contactId) {
+    contactId = await createResellerContact({
+      customerId,
+      name,
+      company,
+      email,
+      address1: address,
+      city,
+      state,
+      country,
+      zipcode,
+      phoneCc,
+      phone,
+      type: 'Contact',
+    });
+  }
+
+  return { customerId, contactId };
+}
+
+/**
+ * Execute live domain registration with ResellerClub API
+ */
+export async function executeLiveDomainRegistration({
+  domainName,
+  years = 1,
+  nameservers = ['ns1.hostingspaceindia.com', 'ns2.hostingspaceindia.com'],
+  clientProfile,
+}: {
+  domainName: string;
+  years?: number;
+  nameservers?: string[];
+  clientProfile: any;
+}) {
+  try {
+    const { customerId, contactId } = await getOrCreateResellerCustomer(clientProfile);
+
+    const result: any = await registerDomain({
+      domainName,
+      years,
+      nameservers: nameservers.length > 0 ? nameservers : ['ns1.hostingspaceindia.com', 'ns2.hostingspaceindia.com'],
+      customerId,
+      contactId,
+      protectPrivacy: false,
+    });
+
+    const orderId = result?.entityid || result?.['entityid'] || result?.description || 'SUCCESS';
+    return { success: true, orderId, result };
+  } catch (error: any) {
+    const message = error.message || 'Domain registration failed on ResellerClub API';
+    const isBalanceError = message.toLowerCase().includes('fund') || 
+                           message.toLowerCase().includes('balance') || 
+                           message.toLowerCase().includes('money') || 
+                           message.toLowerCase().includes('credit');
+    return { success: false, error: message, isBalanceError };
+  }
+}
+

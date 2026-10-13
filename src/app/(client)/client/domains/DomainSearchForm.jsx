@@ -1,26 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardBody, Button, Spinner, Badge, Alert, Form, InputGroup } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { Card, CardBody, Button, Spinner, Badge, Alert, Form, InputGroup, Modal } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 const DEFAULT_PRICES = {
-  'com': '₹899 / year',
-  'in': '₹499 / year',
-  'co.in': '₹399 / year',
-  'net': '₹999 / year',
-  'org': '₹999 / year',
-  'online': '₹199 / 1st yr',
-  'info': '₹399 / 1st yr',
-  'biz': '₹699 / year',
+  'com': '₹1850 / year',
+  'in': '₹899 / year',
+  'co.in': '₹899 / year',
+  'net': '₹1799 / year',
+  'org': '₹1850 / year',
+  'online': '₹499 / 1st yr',
 };
 
 export default function DomainSearchForm() {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedTlds, setSelectedTlds] = useState(['com', 'in', 'co.in', 'net', 'org']);
+  const [selectedTlds, setSelectedTlds] = useState(['com', 'in', 'co.in', 'net', 'org', 'online']);
+
+  // Registration Order Modal State
+  const [orderModalDomain, setOrderModalDomain] = useState(null);
+  const [orderYears, setOrderYears] = useState(1);
+  const [useCustomNs, setUseCustomNs] = useState(false);
+  const [customNs1, setCustomNs1] = useState('');
+  const [customNs2, setCustomNs2] = useState('');
+  const [ordering, setOrdering] = useState(false);
+  const [orderError, setOrderError] = useState(null);
 
   const handleSearch = async (e) => {
     e?.preventDefault();
@@ -52,6 +61,58 @@ export default function DomainSearchForm() {
     );
   };
 
+  const handleOpenOrderModal = (item) => {
+    setOrderModalDomain(item);
+    setOrderYears(1);
+    setUseCustomNs(false);
+    setCustomNs1('');
+    setCustomNs2('');
+    setOrderError(null);
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!orderModalDomain) return;
+
+    if (useCustomNs && (!customNs1.trim() || !customNs2.trim())) {
+      setOrderError('Please enter both Nameserver 1 and Nameserver 2.');
+      return;
+    }
+
+    setOrdering(true);
+    setOrderError(null);
+
+    try {
+      const nameservers = useCustomNs
+        ? [customNs1.trim(), customNs2.trim()]
+        : ['ns1.hostingspaceindia.com', 'ns2.hostingspaceindia.com'];
+
+      const res = await fetch('/api/client/domains/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          domain: orderModalDomain.domain,
+          years: orderYears,
+          nameservers,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate order');
+      }
+
+      // Redirect client directly to the payment checkout page
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        router.push(`/client/invoices/${data.invoiceId}`);
+      }
+    } catch (err) {
+      setOrderError(err.message);
+      setOrdering(false);
+    }
+  };
+
   return (
     <div>
       {/* Search Header Banner */}
@@ -62,7 +123,7 @@ export default function DomainSearchForm() {
           </div>
           <h2 className="fw-bold text-white mb-2">Search & Register New Domains</h2>
           <p className="text-white-50 mx-auto mb-4" style={{ maxWidth: '600px' }}>
-            Check real-time availability across top TLDs and connect instantly with your CyberPanel hosting.
+            Check real-time availability across top TLDs and connect instantly with your hosting.
           </p>
 
           <div className="mx-auto" style={{ maxWidth: '720px' }}>
@@ -73,7 +134,7 @@ export default function DomainSearchForm() {
                 </InputGroup.Text>
                 <Form.Control
                   type="text"
-                  placeholder="Enter your desired domain name (e.g. myshop)"
+                  placeholder="Enter your desired domain name (e.g. sasikala)"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="border-0 shadow-none fs-16 py-2"
@@ -192,7 +253,7 @@ export default function DomainSearchForm() {
                           variant="success"
                           size="sm"
                           className="px-3 py-2 fw-medium d-flex align-items-center"
-                          onClick={() => alert(`Registration request for ${item.domain} initiated. Support team will connect or invoice generated.`)}
+                          onClick={() => handleOpenOrderModal(item)}
                         >
                           <IconifyIcon icon="tabler:shopping-cart-plus" className="me-1" />
                           Register
@@ -258,6 +319,170 @@ export default function DomainSearchForm() {
           </Card>
         </div>
       </div>
+
+      {/* Registration Confirmation Modal */}
+      {orderModalDomain && (
+        <Modal show={!!orderModalDomain} onHide={() => !ordering && setOrderModalDomain(null)} centered size="lg">
+          <Modal.Header closeButton={!ordering}>
+            <Modal.Title className="d-flex align-items-center fs-18">
+              <IconifyIcon icon="tabler:world" className="text-primary me-2 fs-22" />
+              Register Domain: <span className="text-primary ms-1">{orderModalDomain.domain}</span>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-4">
+            {orderError && (
+              <Alert variant="danger" dismissible onClose={() => setOrderError(null)} className="mb-3">
+                <IconifyIcon icon="tabler:alert-triangle" className="me-2" />
+                {orderError}
+              </Alert>
+            )}
+
+            <div className="bg-light rounded p-3 mb-4">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="fw-bold mb-1 fs-16">{orderModalDomain.domain}</h6>
+                  <span className="text-muted fs-13">Ready for instant registration & hosting connect</span>
+                </div>
+                <div className="text-end">
+                  <div className="fw-bold fs-18 text-primary">₹{orderModalDomain.sellingPrice || 1799} / yr</div>
+                  {orderModalDomain.renewalPrice && (
+                    <div className="text-muted fs-12">Renews at ₹{orderModalDomain.renewalPrice}/yr</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Registration Duration */}
+            <div className="mb-4">
+              <label className="form-label fw-bold">Registration Period</label>
+              <div className="row g-2">
+                {[1, 2, 3].map((yr) => {
+                  const price = (orderModalDomain.sellingPrice || 1799) * yr;
+                  const isSelected = orderYears === yr;
+                  return (
+                    <div className="col-4" key={yr}>
+                      <div
+                        onClick={() => !ordering && setOrderYears(yr)}
+                        className={`p-3 rounded border text-center transition-all ${
+                          isSelected ? 'border-primary bg-primary bg-opacity-10 text-primary' : 'bg-white'
+                        }`}
+                        style={{ cursor: ordering ? 'not-allowed' : 'pointer' }}
+                      >
+                        <div className="fw-bold fs-15">{yr} {yr === 1 ? 'Year' : 'Years'}</div>
+                        <div className="fs-13 fw-semibold mt-1">₹{price}</div>
+                        {yr > 1 && <span className="badge bg-success-subtle text-success fs-10 mt-1">Save hassle</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Nameservers Configuration */}
+            <div className="mb-4">
+              <label className="form-label fw-bold mb-2">Nameserver Configuration</label>
+              <div className="form-check mb-2">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="nsType"
+                  id="nsDefault"
+                  checked={!useCustomNs}
+                  onChange={() => setUseCustomNs(false)}
+                  disabled={ordering}
+                />
+                <label className="form-check-label" htmlFor="nsDefault">
+                  <strong>Use Hosting Space India Nameservers (Recommended)</strong>
+                  <div className="text-muted fs-12">
+                    Default: <code>ns1.hostingspaceindia.com</code>, <code>ns2.hostingspaceindia.com</code>
+                  </div>
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="nsType"
+                  id="nsCustom"
+                  checked={useCustomNs}
+                  onChange={() => setUseCustomNs(true)}
+                  disabled={ordering}
+                />
+                <label className="form-check-label" htmlFor="nsCustom">
+                  <strong>Use Custom Nameservers</strong>
+                </label>
+              </div>
+
+              {useCustomNs && (
+                <div className="row g-2 mt-2 ps-4">
+                  <div className="col-sm-6">
+                    <Form.Control
+                      type="text"
+                      placeholder="Nameserver 1 (e.g. ns1.example.com)"
+                      value={customNs1}
+                      onChange={(e) => setCustomNs1(e.target.value)}
+                      disabled={ordering}
+                    />
+                  </div>
+                  <div className="col-sm-6">
+                    <Form.Control
+                      type="text"
+                      placeholder="Nameserver 2 (e.g. ns2.example.com)"
+                      value={customNs2}
+                      onChange={(e) => setCustomNs2(e.target.value)}
+                      disabled={ordering}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Cost Breakdown */}
+            <div className="border-top pt-3">
+              <div className="d-flex justify-content-between mb-2 fs-14">
+                <span>Domain Registration ({orderYears} {orderYears === 1 ? 'year' : 'years'})</span>
+                <span className="fw-semibold">₹{(orderModalDomain.sellingPrice || 1799) * orderYears}</span>
+              </div>
+              <div className="d-flex justify-content-between mb-2 fs-14 text-muted">
+                <span>Estimated GST (18%)</span>
+                <span>+₹{(((orderModalDomain.sellingPrice || 1799) * orderYears * 0.18)).toFixed(2)}</span>
+              </div>
+              <div className="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                <span className="fw-bold fs-16">Estimated Total</span>
+                <span className="fw-bold fs-18 text-primary">
+                  ₹{(((orderModalDomain.sellingPrice || 1799) * orderYears * 1.18)).toFixed(2)}
+                </span>
+              </div>
+              <p className="text-muted fs-11 mt-1 mb-0">
+                * An official invoice will be generated. You can pay securely with UPI, Credit/Debit Cards, or Netbanking via Cashfree.
+              </p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setOrderModalDomain(null)} disabled={ordering}>
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              onClick={handleConfirmOrder}
+              disabled={ordering}
+              className="d-flex align-items-center"
+            >
+              {ordering ? (
+                <>
+                  <Spinner size="sm" className="me-2" />
+                  Generating Invoice & Checkout...
+                </>
+              ) : (
+                <>
+                  <IconifyIcon icon="tabler:credit-card" className="me-1" />
+                  Proceed to Payment
+                </>
+              )}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 }

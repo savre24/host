@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, Row, Col, Table, Button, Form, InputGroup, Badge, Alert, Spinner, Nav, Tab } from 'react-bootstrap';
+import { Card, CardBody, Row, Col, Table, Button, Form, InputGroup, Badge, Alert, Spinner, Nav, Tab, Modal } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-export default function AdminDomainsClient({ initialClientServices = [] }) {
+export default function AdminDomainsClient({ initialClientServices = [], clients = [] }) {
   // Wallet state
   const [wallet, setWallet] = useState(null);
   const [walletLoading, setWalletLoading] = useState(false);
@@ -25,6 +25,53 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
   const [clientServices, setClientServices] = useState(initialClientServices);
   const [renewingId, setRenewingId] = useState(null);
   const [renewMessage, setRenewMessage] = useState(null);
+
+  // Admin Domain Registration Modal State
+  const [registerModalDomain, setRegisterModalDomain] = useState(null);
+  const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
+  const [registerYears, setRegisterYears] = useState(1);
+  const [registerAction, setRegisterAction] = useState('LIVE_REGISTER');
+  const [registering, setRegistering] = useState(false);
+  const [registerResult, setRegisterResult] = useState(null);
+
+  const handleRegisterForClient = async () => {
+    if (!registerModalDomain || !selectedClientId) return;
+    setRegistering(true);
+    setRegisterResult(null);
+
+    try {
+      const res = await fetch('/api/admin/domains/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          domainName: registerModalDomain.domain,
+          clientId: selectedClientId,
+          years: registerYears,
+          action: registerAction,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to process registration');
+      }
+
+      setRegisterResult({
+        type: 'success',
+        text: data.message || `Successfully processed ${registerModalDomain.domain}!`,
+      });
+
+      // Refresh wallet
+      fetchWallet();
+    } catch (err) {
+      setRegisterResult({
+        type: 'danger',
+        text: err.message,
+      });
+    } finally {
+      setRegistering(false);
+    }
+  };
 
   // Load wallet balance
   const fetchWallet = async () => {
@@ -470,7 +517,13 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
                                   <Button 
                                     variant="outline-success" 
                                     size="sm"
-                                    onClick={() => alert(`Domain ${r.domain} is ready to register. Wholesale cost: ₹${r.wholesaleRegister}.`)}
+                                    onClick={() => {
+                                      setRegisterModalDomain(r);
+                                      setSelectedClientId(clients[0]?.id || '');
+                                      setRegisterYears(1);
+                                      setRegisterAction('LIVE_REGISTER');
+                                      setRegisterResult(null);
+                                    }}
                                   >
                                     <IconifyIcon icon="tabler:plus" className="me-1" /> Register for Client
                                   </Button>
@@ -576,6 +629,154 @@ export default function AdminDomainsClient({ initialClientServices = [] }) {
           </CardBody>
         </Card>
       </Tab.Container>
+
+      {/* Admin Domain Registration Modal */}
+      {registerModalDomain && (
+        <Modal show={!!registerModalDomain} onHide={() => !registering && setRegisterModalDomain(null)} centered size="lg">
+          <Modal.Header closeButton={!registering}>
+            <Modal.Title className="d-flex align-items-center fs-18">
+              <IconifyIcon icon="tabler:world" className="text-primary me-2 fs-22" />
+              Register Domain for Client: <span className="text-primary ms-1">{registerModalDomain.domain}</span>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-4">
+            {registerResult && (
+              <Alert variant={registerResult.type} dismissible onClose={() => setRegisterResult(null)} className="mb-3">
+                {registerResult.text}
+              </Alert>
+            )}
+
+            <div className="bg-light rounded p-3 mb-3">
+              <div className="row g-2">
+                <div className="col-sm-6">
+                  <span className="text-muted fs-12 d-block">Domain Name</span>
+                  <strong className="fs-16 text-primary">{registerModalDomain.domain}</strong>
+                </div>
+                <div className="col-sm-6">
+                  <span className="text-muted fs-12 d-block">Wholesale Cost (Incl. 18% GST)</span>
+                  <strong className="fs-15 text-danger">
+                    ₹{registerModalDomain.wholesaleRegister ? (registerModalDomain.wholesaleRegister * 1.18).toFixed(2) : '--'}
+                  </strong>
+                </div>
+                <div className="col-sm-6 mt-2">
+                  <span className="text-muted fs-12 d-block">Retail Selling Price</span>
+                  <strong className="fs-15 text-success">
+                    ₹{registerModalDomain.sellingPrice ? registerModalDomain.sellingPrice.toFixed(2) : '--'}
+                  </strong>
+                </div>
+                <div className="col-sm-6 mt-2">
+                  <span className="text-muted fs-12 d-block">Your Profit Margin</span>
+                  <strong className="fs-15 text-primary">
+                    +₹{registerModalDomain.sellingPrice && registerModalDomain.wholesaleRegister
+                      ? (registerModalDomain.sellingPrice - (registerModalDomain.wholesaleRegister * 1.18)).toFixed(2)
+                      : '--'}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Select Client */}
+            <div className="mb-3">
+              <label className="form-label fw-bold">Select Client</label>
+              {clients.length > 0 ? (
+                <Form.Select 
+                  value={selectedClientId} 
+                  onChange={(e) => setSelectedClientId(e.target.value)}
+                  disabled={registering}
+                >
+                  {clients.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.user?.name || c.companyName || 'Client'} ({c.user?.email || c.phone || 'No Email'})
+                    </option>
+                  ))}
+                </Form.Select>
+              ) : (
+                <div className="alert alert-warning py-2 fs-13 mb-0">
+                  No clients found in database. Please create a client profile first.
+                </div>
+              )}
+            </div>
+
+            {/* Registration Years */}
+            <div className="mb-3">
+              <label className="form-label fw-bold">Registration Period</label>
+              <Form.Select
+                value={registerYears}
+                onChange={(e) => setRegisterYears(Number(e.target.value))}
+                disabled={registering}
+              >
+                <option value={1}>1 Year (₹{registerModalDomain.sellingPrice})</option>
+                <option value={2}>2 Years (₹{(registerModalDomain.sellingPrice || 0) * 2})</option>
+                <option value={3}>3 Years (₹{(registerModalDomain.sellingPrice || 0) * 3})</option>
+              </Form.Select>
+            </div>
+
+            {/* Registration Action */}
+            <div className="mb-3">
+              <label className="form-label fw-bold d-block">Action Type</label>
+              <div className="form-check mb-2">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="adminRegAction"
+                  id="actionLive"
+                  value="LIVE_REGISTER"
+                  checked={registerAction === 'LIVE_REGISTER'}
+                  onChange={() => setRegisterAction('LIVE_REGISTER')}
+                  disabled={registering}
+                />
+                <label className="form-check-label" htmlFor="actionLive">
+                  <strong>Live Register via ResellerClub (Instant API Purchase)</strong>
+                  <div className="text-muted fs-12">
+                    Deducts ₹{registerModalDomain.wholesaleRegister ? (registerModalDomain.wholesaleRegister * 1.18).toFixed(2) : '--'} from your ResellerClub wallet balance (Current: ₹{wallet?.balance?.balance || '23.58'}).
+                  </div>
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="adminRegAction"
+                  id="actionInvoice"
+                  value="INVOICE_ONLY"
+                  checked={registerAction === 'INVOICE_ONLY'}
+                  onChange={() => setRegisterAction('INVOICE_ONLY')}
+                  disabled={registering}
+                />
+                <label className="form-check-label" htmlFor="actionInvoice">
+                  <strong>Create Invoice & Assign Service (Client pays first)</strong>
+                  <div className="text-muted fs-12">
+                    Generates a pending invoice of ₹{registerModalDomain.sellingPrice} for the client to pay online via Cashfree.
+                  </div>
+                </label>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setRegisterModalDomain(null)} disabled={registering}>
+              Close
+            </Button>
+            <Button
+              variant="success"
+              onClick={handleRegisterForClient}
+              disabled={registering || !selectedClientId}
+              className="d-flex align-items-center"
+            >
+              {registering ? (
+                <>
+                  <Spinner size="sm" className="me-2" />
+                  Processing Registration...
+                </>
+              ) : (
+                <>
+                  <IconifyIcon icon="tabler:check" className="me-1" />
+                  {registerAction === 'LIVE_REGISTER' ? 'Register on ResellerClub' : 'Generate Client Invoice'}
+                </>
+              )}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 }

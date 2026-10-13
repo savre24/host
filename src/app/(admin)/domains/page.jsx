@@ -8,43 +8,59 @@ export const metadata = {
 
 export default async function AdminDomainsPage() {
   let domainServices = [];
+  let clients = [];
+
   try {
-    domainServices = await prisma.clientService.findMany({
-      where: {
-        OR: [
-          { product: { category: 'DOMAIN' } },
-          { domainDetail: { isNot: null } },
-        ],
-      },
-      include: {
-        client: {
-          select: {
-            id: true,
-            companyName: true,
-            user: { select: { name: true, email: true } },
-          },
+    const [fetchedServices, fetchedClients] = await Promise.all([
+      prisma.clientService.findMany({
+        where: {
+          OR: [
+            { product: { category: 'DOMAIN' } },
+            { domainDetail: { isNot: null } },
+          ],
         },
-        product: {
-          select: {
-            id: true,
-            name: true,
-            category: true,
-            defaultPrice: true,
-            renewalPrice: true,
+        include: {
+          client: {
+            select: {
+              id: true,
+              companyName: true,
+              user: { select: { name: true, email: true } },
+            },
           },
+          product: {
+            select: {
+              id: true,
+              name: true,
+              category: true,
+              defaultPrice: true,
+              renewalPrice: true,
+            },
+          },
+          domainDetail: true,
         },
-        domainDetail: true,
-      },
-      orderBy: { expiryDate: 'asc' },
-    });
+        orderBy: { expiryDate: 'asc' },
+      }),
+      prisma.clientProfile.findMany({
+        include: {
+          user: { select: { name: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    domainServices = fetchedServices;
+    clients = fetchedClients;
   } catch (err) {
-    console.warn('Could not fetch domain services (using empty list):', err.message);
+    console.warn('Could not fetch domain services or clients:', err?.message);
   }
 
   return (
     <>
       <PageTitle title="Domain Management" subTitle="ResellerClub Integration" />
-      <AdminDomainsClient initialClientServices={domainServices} />
+      <AdminDomainsClient 
+        initialClientServices={domainServices} 
+        clients={clients} 
+      />
     </>
   );
 }
